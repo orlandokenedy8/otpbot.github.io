@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-04GEYBFCJ9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-04GEYBFCJ9');
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7646625592512538"
+     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7646625592512538"
+     crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Free Virtual Numbers Online - Receive SMS & OTP Instantly | FreeNumber</title>
+    <meta name="description" content="Get free virtual phone numbers from 25+ countries. Receive SMS and OTP instantly for WhatsApp, Telegram, verification. No registration required.">
+    <meta name="keywords" content="free virtual number, free phone number, receive sms online, temporary phone number, virtual number for WhatsApp, OTP receive, SMS verification">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://freenumber.site/">
+    <meta property="og:title" content="Free Virtual Numbers - Receive SMS & OTP Online">
+    <meta property="og:description" content="Access free virtual phone numbers from 25+ countries. Perfect for SMS verification, WhatsApp, Telegram and more.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://freenumber.site/">
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"FreeNumber","description":"Free virtual phone numbers and SMS receiver service","url":"https://freenumber.site/","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .number, .otp-code, .otp-message, input, textarea {
+            -webkit-user-select: text; user-select: text;
+        }
+
+        :root {
+            --bg: #0d0f14;
+            --bg2: #13161d;
+            --bg3: #1a1e28;
+            --border: rgba(255,255,255,0.07);
+            --border2: rgba(255,255,255,0.12);
+            --text: #e8eaf0;
+            --text2: #8891a4;
+            --accent: #5b7fff;
+            --accent2: #3d5edb;
+            --green: #34d39a;
+            --orange: #ff8c42;
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.35);
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --nav-h: 56px;
+        }
+
+        [data-theme="light"] {
+            --bg: #f0f2f8;
+            --bg2: #ffffff;
+            --bg3: #e8ecf4;
+            --border: rgba(0,0,0,0.08);
+            --border2: rgba(0,0,0,0.14);
+            --text: #111827;
+            --text2: #6b7280;
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background .3s, color .3s;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: sticky; top: 0; z-index: 200;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        nav {
+            max-width: 1300px; margin: 0 auto;
+            padding: 0 8px;
+            height: var(--nav-h);
+            display: flex; align-items: center; gap: 6px;
+            overflow: hidden;
+        }
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 15px; font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .logo span { color: var(--text); }
+
+        /* Tabs - push to center with flex */
+        .tabs {
+            display: flex; gap: 2px; padding: 3px;
+            background: var(--bg3); border-radius: var(--radius-sm);
+            flex: 1; justify-content: center;
+        }
+        .tab-btn {
+            padding: 6px 10px; border: none; border-radius: 6px;
+            cursor: pointer; font-family: var(--font-body); font-size: 12px; font-weight: 600;
+            background: transparent; color: var(--text2); transition: all .2s;
+            white-space: nowrap; flex: 1; text-align: center;
+        }
+        .tab-btn.active { background: var(--accent); color: #fff; }
+
+        .nav-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+        /* Lang button: icon + text. Theme button: icon only */
+        .nav-btn {
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            padding: 7px 8px; border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); cursor: pointer;
+            font-family: var(--font-body); font-size: 12px; font-weight: 600;
+            background: transparent; color: var(--text2);
+            transition: all .2s; white-space: nowrap;
+            height: 34px; min-width: 34px;
+        }
+        .nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .nav-btn .icon { font-size: 15px; line-height: 1; }
+
+        /* ===== MAIN ===== */
+        main {
+            max-width: 1300px; margin: 0 auto;
+            padding: 16px 12px 100px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center; padding: 28px 16px 24px;
+            background: linear-gradient(135deg, rgba(91,127,255,0.06) 0%, transparent 60%);
+            border-radius: 16px; margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .hero h1 {
+            font-size: clamp(18px, 4vw, 38px); font-weight: 700;
+            letter-spacing: -0.5px; margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text) 60%, var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            line-height: 1.3;
+        }
+        .hero p { font-size: 13px; color: var(--text2); max-width: 500px; margin: 0 auto; }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar {
+            display: flex; gap: 8px; margin-bottom: 20px;
+            align-items: center;
+        }
+        .search-input-wrap {
+            flex: 1; position: relative;
+        }
+        .search-input-wrap svg {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            width: 15px; height: 15px; fill: var(--text2); pointer-events: none;
+        }
+        .search-input {
+            width: 100%; padding: 10px 12px 10px 36px;
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); color: var(--text);
+            font-family: var(--font-body); font-size: 14px;
+            transition: border-color .2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--accent); }
+        .search-input::placeholder { color: var(--text2); }
+
+        .live-badge {
+            display: flex; align-items: center; gap: 5px;
+            padding: 8px 12px; background: var(--bg2);
+            border: 1px solid var(--border2); border-radius: var(--radius-sm);
+            font-size: 12px; color: var(--text2); font-weight: 500;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green); flex-shrink: 0;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        /* ===== SECTIONS ===== */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* ===== STATS ROW ===== */
+        .stats-row {
+            display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: nowrap; overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .stats-row::-webkit-scrollbar { display: none; }
+        .stat-pill {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 10px 14px;
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .stat-num { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--accent); }
+        .stat-lbl { font-size: 11px; color: var(--text2); }
+
+        /* ===== COUNTRY GRID ===== */
+        .section-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--text2); margin-bottom: 12px;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .country-card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 14px;
+            cursor: pointer; transition: all .22s ease;
+            position: relative; overflow: hidden;
+        }
+        .country-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, var(--accent), transparent);
+            opacity: 0; transition: opacity .22s;
+        }
+        .country-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--card-shadow); }
+        .country-card:hover::before { opacity: 0.05; }
+        .country-card:active { transform: translateY(0); opacity: 0.85; }
+
+        .cc-flag { font-size: 32px; margin-bottom: 8px; display: block; line-height: 1; }
+        .cc-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+        .cc-meta { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .cc-count {
+            font-size: 11px; font-weight: 700; font-family: var(--font-mono);
+            background: rgba(91,127,255,0.12); color: var(--accent);
+            padding: 2px 7px; border-radius: 100px;
+        }
+        .cc-otp-badge {
+            font-size: 10px; font-weight: 700;
+            background: rgba(52,211,154,0.12); color: var(--green);
+            padding: 2px 7px; border-radius: 100px;
+            display: none;
+        }
+        .cc-otp-badge.visible { display: inline-flex; align-items: center; gap: 3px; }
+        .cc-arrow {
+            margin-left: auto; color: var(--text2); font-size: 16px;
+            transition: transform .2s;
+        }
+        .country-card:hover .cc-arrow { transform: translateX(3px); color: var(--accent); }
+
+        /* ===== COUNTRY DETAIL ===== */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 14px; border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 16px;
+            font-family: var(--font-body); font-size: 13px; font-weight: 600;
+            background: var(--bg2); color: var(--text2); transition: all .2s;
+        }
+        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .country-detail-header {
+            display: flex; align-items: center; gap: 14px;
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 18px; margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .cdh-flag { font-size: 42px; line-height: 1; flex-shrink: 0; }
+        .cdh-info { flex: 1; min-width: 0; }
+        .cdh-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+        .cdh-info p { font-size: 12px; color: var(--text2); }
+
+        .numbers-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px; margin-bottom: 24px;
+        }
+
+        .number-card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 18px;
+            transition: all .2s;
+        }
+        .number-val {
+            font-family: var(--font-mono); font-size: 17px; font-weight: 700;
+            color: var(--text); margin-bottom: 12px; letter-spacing: -0.5px;
+            word-break: break-all;
+        }
+        .number-actions { display: flex; gap: 7px; }
+        .btn {
+            flex: 1; padding: 8px 10px; border: none; border-radius: var(--radius-sm);
+            cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 600;
+            transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 5px;
+            touch-action: manipulation;
+        }
+        .btn-copy { background: rgba(91,127,255,0.12); color: var(--accent); }
+        .btn-copy:hover { background: var(--accent); color: #fff; }
+        .btn-otp { background: rgba(52,211,154,0.12); color: var(--green); }
+        .btn-otp:hover { background: var(--green); color: #fff; }
+
+        /* ===== OTP SECTION ===== */
+        .otp-filters {
+            display: flex; gap: 8px; align-items: center;
+            flex-wrap: wrap; margin-bottom: 16px;
+        }
+        .otp-select {
+            padding: 8px 12px; background: var(--bg2);
+            border: 1px solid var(--border2); border-radius: var(--radius-sm);
+            color: var(--text); font-family: var(--font-body); font-size: 13px; cursor: pointer;
+            flex: 1; min-width: 120px; max-width: 180px;
+        }
+        .otp-select:focus { outline: none; border-color: var(--accent); }
+
+        .otp-search-wrap {
+            flex: 2; min-width: 150px; position: relative;
+        }
+        .otp-search-wrap svg {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 14px; fill: var(--text2); pointer-events: none;
+        }
+
+        .refresh-btn {
+            padding: 8px 14px; border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); cursor: pointer;
+            background: var(--bg2); color: var(--text2);
+            font-family: var(--font-body); font-size: 13px; font-weight: 600;
+            transition: all .2s; display: flex; align-items: center; gap: 5px;
+            white-space: nowrap; flex-shrink: 0; touch-action: manipulation;
+        }
+        .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .refresh-btn.spinning svg { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== OTP GRID — NO BLINK FIX ===== */
+        .otp-grid { display: grid; gap: 10px; }
+
+        .otp-card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 14px 16px;
+            /* NO transition on border-color to prevent flicker */
+            contain: layout style;
+        }
+        /* Only NEW cards get animation — existing cards never re-animate */
+        .otp-card.is-new {
+            animation: slideIn .25s ease forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .otp-top {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px; gap: 8px; flex-wrap: wrap;
+        }
+        .otp-country-info { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+        .otp-flag { font-size: 20px; line-height: 1; flex-shrink: 0; }
+        .otp-country-name { font-size: 13px; font-weight: 600; color: var(--text); }
+        .otp-sender {
+            font-size: 11px; color: var(--text2);
+            background: var(--bg3); padding: 2px 7px; border-radius: 100px; font-weight: 500;
+        }
+        .otp-time { font-size: 11px; color: var(--text2); white-space: nowrap; flex-shrink: 0; }
+
+        .otp-code-block {
+            background: linear-gradient(135deg, rgba(91,127,255,.1), rgba(91,127,255,.04));
+            border: 1px solid rgba(91,127,255,.2);
+            border-radius: var(--radius-sm); padding: 10px 14px;
+            margin-bottom: 10px; text-align: center; cursor: pointer;
+            transition: background .15s;
+        }
+        .otp-code-block:hover { background: rgba(91,127,255,.16); }
+        .otp-code-block:active { background: rgba(91,127,255,.22); }
+        .otp-code-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; color: var(--accent); text-transform: uppercase; }
+        .otp-code-val {
+            font-family: var(--font-mono); font-size: 24px; font-weight: 700;
+            color: var(--accent); letter-spacing: 4px; margin-top: 2px;
+        }
+
+        .otp-number-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px; gap: 8px;
+        }
+        .otp-num-label { font-size: 11px; color: var(--text2); flex-shrink: 0; }
+        .otp-num-val { font-family: var(--font-mono); font-size: 13px; color: var(--text); font-weight: 600; word-break: break-all; text-align: right; }
+
+        .otp-msg {
+            background: var(--bg3); border-radius: var(--radius-sm);
+            padding: 9px 11px; font-size: 12px; color: var(--text2);
+            word-break: break-word; line-height: 1.5;
+            max-height: 70px; overflow-y: auto; margin-bottom: 10px;
+            font-family: var(--font-mono);
+            -webkit-overflow-scrolling: touch;
+        }
+        .otp-copy-btn {
+            width: 100%; padding: 8px; border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); background: transparent; color: var(--text2);
+            font-family: var(--font-body); font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: all .2s; touch-action: manipulation;
+        }
+        .otp-copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .otp-copy-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 500; overflow-y: auto;
+            padding: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal.open { display: flex; align-items: flex-start; justify-content: center; }
+        .modal-inner {
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-radius: 18px; padding: 22px;
+            max-width: 680px; width: 100%; margin: 20px auto;
+            animation: modalIn .22s ease;
+        }
+        @keyframes modalIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:none; } }
+        .modal-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+        .modal-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+        .modal-close {
+            width: 34px; height: 34px; border: none; background: var(--bg3);
+            border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--text2);
+            display: flex; align-items: center; justify-content: center;
+            transition: all .2s; flex-shrink: 0; touch-action: manipulation;
+        }
+        .modal-close:hover { background: var(--accent); color: #fff; transform: rotate(90deg); }
+
+        .modal-number-banner {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: var(--radius); padding: 14px 18px;
+            text-align: center; margin-bottom: 16px; color: #fff;
+        }
+        .modal-number-label { font-size: 11px; opacity: 0.8; margin-bottom: 3px; }
+        .modal-number-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; letter-spacing: 1px; word-break: break-all; }
+
+        .modal-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; gap: 8px;
+        }
+        .modal-live-badge {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--green); font-weight: 600;
+        }
+        .modal-live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green); animation: blink 2s infinite;
+        }
+        .modal-refresh-btn {
+            display: flex; align-items: center; gap: 5px;
+            padding: 6px 12px; border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); background: var(--bg3);
+            color: var(--text2); font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all .2s; touch-action: manipulation;
+        }
+        .modal-refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .modal-refresh-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .modal-refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+        .modal-otp-count { font-size: 11px; color: var(--text2); }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center; padding: 48px 20px; color: var(--text2);
+        }
+        .empty-icon { font-size: 44px; margin-bottom: 12px; opacity: .4; }
+        .empty-state h3 { font-size: 14px; color: var(--text2); font-weight: 500; }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed; top: 70px; right: 12px; left: 12px;
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-left: 3px solid var(--green);
+            padding: 10px 16px; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; color: var(--text);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 1000; display: none;
+            max-width: 400px; margin: 0 auto;
+        }
+        @media (min-width: 480px) {
+            .notification {
+                top: 20px; right: 16px; left: auto;
+                min-width: 200px; max-width: 320px;
+            }
+        }
+        .notification.show { display: block; animation: notifIn .22s ease; }
+        @keyframes notifIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:none; } }
+
+        /* ===== TELEGRAM FLOAT ===== */
+        .tg-float {
+            position: fixed; bottom: 20px; right: 16px; z-index: 300;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, #229ED9, #1a87be);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(34,158,217,.4);
+            text-decoration: none; transition: all .3s;
+        }
+        .tg-float:hover { transform: scale(1.1) translateY(-3px); }
+        .tg-float svg { width: 24px; height: 24px; fill: #fff; }
+
+        /* ===== LANG DROPDOWN ===== */
+        .lang-wrap { position: static; }
+        .lang-menu {
+            display: none; position: fixed; right: 8px; top: calc(var(--nav-h) + 4px);
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-radius: var(--radius-sm); min-width: 150px; z-index: 9999;
+            box-shadow: 0 8px 32px rgba(0,0,0,.5);
+        }
+        .lang-menu.open { display: block; }
+        .lang-opt {
+            padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500;
+            display: flex; align-items: center; gap: 8px; transition: background .15s;
+        }
+        .lang-opt:hover { background: var(--bg3); }
+        .lang-opt.active { color: var(--accent); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--bg2); border-top: 1px solid var(--border);
+            padding: 32px 12px 20px;
+        }
+        .footer-inner {
+            max-width: 1300px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 24px 16px; margin-bottom: 20px;
+        }
+        .footer-col h4 {
+            font-size: 11px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+        }
+        .footer-col p, .footer-col a {
+            font-size: 12px; color: var(--text2); text-decoration: none;
+            display: block; margin-bottom: 7px; transition: color .2s;
+            word-break: break-word;
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            max-width: 1300px; margin: 0 auto; padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center; font-size: 11px; color: var(--text2);
+        }
+
+        /* ===== RESPONSIVE — Desktop ===== */
+        @media (min-width: 768px) {
+            :root { --nav-h: 62px; }
+            nav { padding: 0 20px; gap: 12px; }
+            .logo { font-size: 20px; }
+            .tab-btn { padding: 7px 16px; font-size: 13px; }
+            .nav-btn { padding: 8px 14px; font-size: 13px; }
+            main { padding: 28px 20px 100px; }
+            .hero { padding: 44px 20px 36px; }
+            .hero p { font-size: 15px; }
+            .countries-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+            .numbers-list { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+            .footer-inner { grid-template-columns: repeat(4, 1fr); }
+            .notification { top: 20px; right: 20px; left: auto; }
+            .tg-float { width: 54px; height: 54px; bottom: 28px; right: 24px; }
+            .tg-float svg { width: 28px; height: 28px; }
+        }
+
+        /* ===== RESPONSIVE — Small mobile ===== */
+        @media (max-width: 360px) {
+            .tab-btn { padding: 6px 8px; font-size: 11px; }
+            .logo { font-size: 15px; }
+            .nav-btn .lang-text { display: none; }
+            .countries-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Hide lang label text on small screens */
+        .lang-text { display: none; }
+
+        @media (min-width: 480px) {
+            .lang-text { display: inline; }
+        }
+        .cdh-search {
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+        }
+        .cdh-search svg {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 14px; fill: none; stroke: var(--text2); stroke-width: 2;
+            pointer-events: none;
+        }
+        .cdh-search input {
+            width: 100%; padding: 9px 12px 9px 34px;
+        }
+
+        @media (min-width: 600px) {
+            .country-detail-header { flex-wrap: nowrap; }
+            .cdh-search { width: auto; flex: 1; min-width: 200px; margin-top: 0; margin-left: auto; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+<header>
+    <nav>
+        <div class="logo">Free<span>Number</span></div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchView('home')" id="homeTab">📞 Numbers</button>
+            <button class="tab-btn" onclick="switchView('otps')" id="otpsTab">🔑 OTPs</button>
+        </div>
+        <div class="nav-right">
+            <div class="lang-wrap">
+                <button class="nav-btn" onclick="toggleLang()" id="langBtn">
+                    <span class="icon">🌐</span>
+                    <span id="langLabel" class="lang-text">EN</span>
+                </button>
+                <div class="lang-menu" id="langMenu">
+                    <div class="lang-opt active" onclick="setLang('en')">🇬🇧 English</div>
+                    <div class="lang-opt" onclick="setLang('id')">🇮🇩 Bahasa</div>
+                    <div class="lang-opt" onclick="setLang('ur')">🇵🇰 اردو</div>
+                    <div class="lang-opt" onclick="setLang('es')">🇪🇸 Español</div>
+                    <div class="lang-opt" onclick="setLang('ar')">🇸🇦 العربية</div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="toggleTheme()" title="Toggle theme">
+                <span class="icon" id="themeIcon">☀️</span>
+            </button>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <h1 id="heroTitle">Free Virtual Numbers & SMS Receiver Online</h1>
+        <p id="heroDesc">Get free phone numbers from 25+ countries. Receive SMS & OTP instantly — no registration needed.</p>
+    </section>
+
+    <div class="search-bar">
+        <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <input class="search-input" type="text" id="mainSearch" placeholder="Search country or number..." oninput="handleSearch()" autocomplete="off">
+        </div>
+        <div class="live-badge" id="liveStatus">
+            <span class="live-dot" id="liveDot"></span> Live
+        </div>
+    </div>
+
+    <!-- HOME: Country Grid -->
+    <div id="viewHome" class="view-section active">
+        <div class="stats-row">
+            <div class="stat-pill"><div class="stat-num" id="totalNums">0</div><div class="stat-lbl">Numbers</div></div>
+            <div class="stat-pill"><div class="stat-num" id="totalCnts">0</div><div class="stat-lbl">Countries</div></div>
+            <div class="stat-pill"><div class="stat-num" id="totalOtpsStat">0</div><div class="stat-lbl">OTPs Today</div></div>
+        </div>
+        <div class="section-title" id="countriesLabel">SELECT A COUNTRY</div>
+        <div class="countries-grid" id="countriesGrid">
+            <div class="empty-state"><div class="empty-icon">🌐</div><h3>Loading...</h3></div>
+        </div>
+    </div>
+
+    <!-- COUNTRY DETAIL -->
+    <div id="viewCountry" class="view-section">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <div class="country-detail-header" id="countryDetailHeader"></div>
+        <div class="section-title">PHONE NUMBERS</div>
+        <div class="numbers-list" id="numbersList"></div>
+    </div>
+
+    <!-- OTP FEED -->
+    <div id="viewOtps" class="view-section">
+        <div class="stats-row">
+            <div class="stat-pill"><div class="stat-num" id="otpCount">0</div><div class="stat-lbl">OTPs Today</div></div>
+            <div class="stat-pill"><div class="stat-num" id="otpCntCount">0</div><div class="stat-lbl">Countries</div></div>
+        </div>
+        <div class="otp-filters">
+            <select class="otp-select" id="otpCountryFilter" onchange="renderOtps()">
+                <option value="all">🌍 All Countries</option>
+            </select>
+            <div class="otp-search-wrap">
+                <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                <input class="search-input" type="text" id="otpSearch" placeholder="Search OTPs..." oninput="renderOtps()" autocomplete="off">
+            </div>
+            <button class="refresh-btn" onclick="manualRefresh()" id="refreshBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                Refresh
+            </button>
+        </div>
+        <div class="otp-grid" id="otpGrid">
+            <div class="empty-state"><div class="empty-icon">🔑</div><h3>No OTPs yet...</h3></div>
+        </div>
+    </div>
+</main>
+
+<!-- OTP Modal -->
+<div class="modal" id="otpModal">
+    <div class="modal-inner">
+        <div class="modal-head">
+            <div class="modal-title" id="modalTitle">OTPs</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-number-banner">
+            <div class="modal-number-label">Phone Number</div>
+            <div class="modal-number-val" id="modalNum"></div>
+        </div>
+        <div class="modal-toolbar">
+            <div class="modal-live-badge">
+                <span class="modal-live-dot" id="modalLiveDot"></span>
+                Live — auto refreshing
+            </div>
+            <span class="modal-otp-count" id="modalOtpCount"></span>
+            <button class="modal-refresh-btn" id="modalRefreshBtn" onclick="manualModalRefresh()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                Refresh
+            </button>
+        </div>
+        <div class="otp-grid" id="modalOtpList"></div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>FreeNumber</h4>
+            <p>Free virtual phone numbers for SMS & OTP verification worldwide. No registration required.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <a href="/">Home</a>
+            <a href="/about.html">About Us</a>
+            <a href="/faq.html">FAQ</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/terms.html">Terms of Service</a>
+        </div>
+        <div class="footer-col">
+            <h4>Community</h4>
+            <a href="https://t.me/VASUHUB" target="_blank">📱 Telegram Channel</a>
+            <a href="https://t.me/DDXOTP" target="_blank">📲 Numbers Channel</a>
+            <a href="https://whatsapp.com/channel/0029Va5XJaU6xCSHlSwIXH1P" target="_blank">📲 WhatsApp</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2026 FreeNumber.site — Free Virtual Numbers & SMS Receiver
+    </div>
+</footer>
+
+<div class="notification" id="notif"></div>
+
+<a href="https://t.me/VASUHUB" target="_blank" class="tg-float" title="Join Telegram">
+    <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.84 8.673c-.137.645-.501.804-.998.501l-2.753-2.028-1.329 1.279c-.147.147-.271.271-.556.271l.199-2.807 5.138-4.645c.223-.199-.049-.31-.346-.111l-6.344 3.997-2.734-.856c-.595-.187-.607-.595.124-.882l10.679-4.115c.496-.187.93.111.77.882z"/></svg>
+</a>
+
+<script>
+const API_BASE = window.API_BASE || 'https://weak-deloris-nothing672434-fe85179d.koyeb.app';
+
+// ===== STATE =====
+let numbers = [];
+let allOtps = [];      // raw from API (today only)
+let currentView = 'home';
+let selectedCountry = null;
+let otpRefreshTimer = null;
+let lastOtpFetch = 0;
+let lang = localStorage.getItem('fn_lang') || 'en';
+
+// PERMANENT Sets — NEVER cleared after first render (page lifetime)
+const domOtpIds    = new Set();  // ids in #otpGrid
+
+// Current active filters (for show/hide)
+let activeCountryFilter = 'all';
+let activeSearchFilter  = '';
+
+const OTP_INTERVAL = 5000;
+
+// ===== THEME =====
+const savedTheme = localStorage.getItem('fn_theme') || 'dark';
+document.body.setAttribute('data-theme', savedTheme);
+document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+function toggleTheme() {
+    const cur = document.body.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('fn_theme', next);
+    document.getElementById('themeIcon').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+// ===== LANGUAGE =====
+const i18n = {
+    en: { heroTitle:'Free Virtual Numbers & SMS Receiver Online', heroDesc:'Get free phone numbers from 25+ countries. Receive SMS & OTP instantly — no registration needed.', countriesLabel:'SELECT A COUNTRY', search:'Search country or number...' },
+    id: { heroTitle:'Nomor Virtual Gratis & Penerima SMS Online', heroDesc:'Dapatkan nomor gratis dari 25+ negara. Terima SMS & OTP instan — tanpa registrasi.', countriesLabel:'PILIH NEGARA', search:'Cari negara atau nomor...' },
+    ur: { heroTitle:'مفت ورچوئل نمبر اور SMS وصول آن لائن', heroDesc:'25+ ممالک سے مفت نمبر حاصل کریں۔ فوری SMS & OTP وصول کریں۔', countriesLabel:'ملک منتخب کریں', search:'ملک یا نمبر تلاش کریں...' },
+    es: { heroTitle:'Números Virtuales Gratis y Receptor de SMS', heroDesc:'Obtén números gratis de 25+ países. Recibe SMS y OTP al instante.', countriesLabel:'SELECCIONA UN PAÍS', search:'Buscar país o número...' },
+    ar: { heroTitle:'أرقام افتراضية مجانية ومستقبل رسائل SMS', heroDesc:'احصل على أرقام مجانية من 25+ دولة. استقبل الرسائل والOTP فوراً.', countriesLabel:'اختر دولة', search:'ابحث عن دولة أو رقم...' }
+};
+const langNames = { en:'EN', id:'ID', ur:'UR', es:'ES', ar:'AR' };
+
+function setLang(l) {
+    lang = l;
+    localStorage.setItem('fn_lang', l);
+    document.getElementById('langLabel').textContent = langNames[l];
+    document.getElementById('langMenu').classList.remove('open');
+    applyLang();
+    document.querySelectorAll('.lang-opt').forEach((el, i) => {
+        el.classList.toggle('active', ['en','id','ur','es','ar'][i] === l);
+    });
+}
+function applyLang() {
+    const t = i18n[lang] || i18n.en;
+    document.getElementById('heroTitle').textContent = t.heroTitle;
+    document.getElementById('heroDesc').textContent = t.heroDesc;
+    const cl = document.getElementById('countriesLabel');
+    if (cl) cl.textContent = t.countriesLabel;
+    const s = document.getElementById('mainSearch');
+    if (s) s.placeholder = t.search;
+}
+function toggleLang() {
+    document.getElementById('langMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+    if (!e.target.closest('.lang-wrap')) document.getElementById('langMenu').classList.remove('open');
+});
+
+// ===== VIEW SWITCHING =====
+function switchView(view) {
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    currentView = view;
+    document.getElementById('mainSearch').value = '';
+
+    if (view === 'home') {
+        document.getElementById('viewHome').classList.add('active');
+        document.getElementById('homeTab').classList.add('active');
+        stopOtpRefresh();
+    } else if (view === 'country') {
+        document.getElementById('viewCountry').classList.add('active');
+        document.getElementById('homeTab').classList.add('active');
+        stopOtpRefresh();
+    } else {
+        document.getElementById('viewOtps').classList.add('active');
+        document.getElementById('otpsTab').classList.add('active');
+        // DON'T clear DOM — just fetch new data and insert only new cards
+        fetchOtps();
+        startOtpRefresh();
+    }
+}
+
+function goBack() {
+    selectedCountry = null;
+    switchView('home');
+}
+
+// ===== NUMBERS =====
+async function loadNumbers() {
+    try {
+        const r = await fetch(API_BASE + '/api/numbers');
+        const d = await r.json();
+        if (d.success) {
+            numbers = d.numbers;
+            renderCountries();
+            updateStats();
+        }
+    } catch(e) { console.error('Numbers fetch error', e); }
+}
+
+function groupByCountry(nums) {
+    const map = {};
+    nums.forEach(n => {
+        const key = n.countryCode || n.country;
+        if (!map[key]) map[key] = { name: n.country, flag: n.flag, code: n.countryCode, items: [] };
+        map[key].items.push(n);
+    });
+    return Object.values(map);
+}
+
+function renderCountries(query='') {
+    const grid = document.getElementById('countriesGrid');
+    const q = query.toLowerCase().trim();
+    let groups;
+
+    if (!q) {
+        groups = groupByCountry(numbers);
+    } else {
+        const matchByCountry = groupByCountry(numbers).filter(g =>
+            g.name.toLowerCase().includes(q) || g.code.toLowerCase().includes(q)
+        );
+        const matchingNums = numbers.filter(n => n.number.toLowerCase().includes(q));
+        const allCodes = new Set([...matchByCountry.map(g => g.code), ...matchingNums.map(n => n.countryCode)]);
+        groups = groupByCountry(numbers.filter(n => allCodes.has(n.countryCode)));
+    }
+
+    if (!groups.length) {
+        grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🌍</div><h3>No countries found</h3></div>';
+        return;
+    }
+    grid.innerHTML = groups.map(g => {
+        const otpCnt = allOtps.filter(o => o.country && g.name && o.country.toLowerCase().includes(g.name.toLowerCase().split(' ')[0])).length;
+        const badge = otpCnt > 0 ? `<span class="cc-otp-badge visible">🔑 ${otpCnt}</span>` : '<span class="cc-otp-badge"></span>';
+        return `
+        <div class="country-card" onclick="openCountry('${encodeURIComponent(JSON.stringify({code:g.code,name:g.name,flag:g.flag}))}')">
+            <span class="cc-flag">${g.flag}</span>
+            <div class="cc-name">${g.name}</div>
+            <div class="cc-meta">
+                <span class="cc-count">${g.items.length} #</span>
+                ${badge}
+                <span class="cc-arrow">›</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openCountry(encoded) {
+    const meta = JSON.parse(decodeURIComponent(encoded));
+    selectedCountry = meta;
+    document.getElementById('mainSearch').value = '';
+    renderCountryDetail(meta);
+    switchView('country');
+}
+
+function renderCountryDetail(meta, numQuery='') {
+    let countryNums = numbers.filter(n => n.countryCode === meta.code);
+    if (numQuery) {
+        countryNums = countryNums.filter(n => n.number.toLowerCase().includes(numQuery.toLowerCase()));
+    }
+
+    document.getElementById('countryDetailHeader').innerHTML = `
+        <span class="cdh-flag">${meta.flag}</span>
+        <div class="cdh-info">
+            <h2>${meta.name}</h2>
+            <p>${countryNums.length} number${countryNums.length !== 1 ? 's' : ''} available</p>
+        </div>
+        <div class="cdh-search">
+            <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"/></svg>
+            <input class="search-input" type="text" placeholder="Search numbers..."
+                oninput="renderCountryDetail(selectedCountry, this.value)"
+                autocomplete="off" value="${numQuery}">
+        </div>`;
+
+    if (!countryNums.length) {
+        document.getElementById('numbersList').innerHTML = '<div class="empty-state"><div class="empty-icon">📞</div><h3>No numbers found</h3></div>';
+        return;
+    }
+    document.getElementById('numbersList').innerHTML = countryNums.map(n => `
+        <div class="number-card">
+            <div class="number-val">${n.number}</div>
+            <div class="number-actions">
+                <button class="btn btn-copy" onclick="copyText('${n.number}', 'Number')">📋 Copy</button>
+                <button class="btn btn-otp" onclick="showNumberOtps('${n.number}', '${meta.name}', '${meta.flag}')">🔍 OTPs</button>
+            </div>
+        </div>`).join('');
+}
+
+function updateStats() {
+    const groups = groupByCountry(numbers);
+    document.getElementById('totalNums').textContent = numbers.length;
+    document.getElementById('totalCnts').textContent = groups.length;
+}
+
+// ===== OTPs — ZERO BLINK ARCHITECTURE =====
+//
+// - API se sirf last 20 OTPs fetch (display ke liye)
+// - Today count alag track hota hai (full count, midnight reset)
+// - domOtpIds kabhi clear nahi hoti — zero blink guarantee
+
+// Today's OTP count (persisted in memory, reset at midnight)
+let todayOtpCount = parseInt(localStorage.getItem('fn_today_count') || '0');
+let todayOtpDate  = localStorage.getItem('fn_today_date') || '';
+
+function getTodayStr() {
+    return new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+}
+
+function checkMidnightReset() {
+    const today = getTodayStr();
+    if (todayOtpDate !== today) {
+        // New day — reset count
+        todayOtpCount = 0;
+        todayOtpDate  = today;
+        localStorage.setItem('fn_today_count', '0');
+        localStorage.setItem('fn_today_date', today);
+    }
+}
+
+function updateTodayCount(apiTodayOtps) {
+    // Use the API's today count (already filtered to today) for accurate total
+    const count = apiTodayOtps.length;
+    if (count > todayOtpCount) {
+        todayOtpCount = count;
+        localStorage.setItem('fn_today_count', String(count));
+        localStorage.setItem('fn_today_date', getTodayStr());
+    }
+    document.getElementById('totalOtpsStat').textContent = todayOtpCount;
+    document.getElementById('otpCount').textContent = todayOtpCount;
+}
+
+async function fetchOtps() {
+    const now = Date.now();
+    if (now - lastOtpFetch < 3000) return;
+    lastOtpFetch = now;
+
+    checkMidnightReset();
+
+    try {
+        // Two parallel fetches:
+        // 1. Last 100 for display
+        // 2. Today's full count (limit=9999 but only today filtered)
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayStr = todayStart.toISOString().slice(0, 10); // YYYY-MM-DD
+
+        const [r1, r2] = await Promise.all([
+            fetch(API_BASE + '/api/otps?limit=100'),
+            fetch(API_BASE + '/api/otps?limit=9999')
+        ]);
+        const [d1, d2] = await Promise.all([r1.json(), r2.json()]);
+
+        if (!d1.success) return;
+
+        // Display: last 100
+        allOtps = d1.otps;
+
+        // Today count: from full fetch, filter to today only
+        const todayOtps = (d2.otps || d1.otps).filter(o =>
+            !o.timestamp || new Date(o.timestamp) >= todayStart
+        );
+
+        // Update today count (always grows, never shrinks until midnight)
+        if (todayOtps.length > todayOtpCount) {
+            todayOtpCount = todayOtps.length;
+            localStorage.setItem('fn_today_count', String(todayOtpCount));
+            localStorage.setItem('fn_today_date', getTodayStr());
+        }
+
+        // Update all count displays
+        document.getElementById('totalOtpsStat').textContent = todayOtpCount;
+        document.getElementById('otpCount').textContent = todayOtpCount;
+
+        if (currentView === 'otps') {
+            updateOtpStats(todayOtps);
+            populateCountryFilter();
+            insertNewOtpCards();
+            applyFilter();
+        }
+        if (currentView === 'home') updateCountryBadges();
+
+        document.getElementById('liveDot').style.background = 'var(--green)';
+
+    } catch(e) {
+        document.getElementById('liveDot').style.background = '#ef4444';
+    }
+}
+
+// Insert only OTPs not yet in DOM — no clearing, no wiping, zero blink
+function insertNewOtpCards() {
+    const grid = document.getElementById('otpGrid');
+    const isFirstLoad = domOtpIds.size === 0;
+
+    const placeholder = grid.querySelector('.empty-state');
+    const newItems = allOtps.filter(o => !domOtpIds.has(o.id));
+
+    if (!newItems.length) return; // nothing new — DOM untouched
+
+    if (placeholder) placeholder.remove();
+
+    const frag = document.createDocumentFragment();
+    newItems.forEach(o => {
+        domOtpIds.add(o.id);
+        const el = document.createElement('div');
+        el.innerHTML = makeOtpCard(o, !isFirstLoad); // no anim on first load
+        frag.appendChild(el.firstElementChild);
+    });
+
+    // Insert at top
+    grid.insertBefore(frag, grid.firstChild);
+
+    // Keep max 100 cards in DOM (trim oldest from bottom)
+    const cards = grid.querySelectorAll('.otp-card');
+    if (cards.length > 100) {
+        Array.from(cards).slice(100).forEach(c => {
+            domOtpIds.delete(c.dataset.id);
+            c.remove();
+        });
+    }
+}
+
+// Filter = CSS show/hide only. Zero DOM rebuild. Zero blink.
+function applyFilter() {
+    const cf = activeCountryFilter;
+    const sq = activeSearchFilter.toLowerCase();
+
+    document.querySelectorAll('#otpGrid .otp-card').forEach(card => {
+        const id = card.dataset.id;
+        const o  = allOtps.find(x => x.id === id);
+        if (!o) { card.style.display = 'none'; return; }
+
+        const countryOk = cf === 'all' || o.country === cf;
+        const searchOk  = !sq ||
+            (o.number||'').toLowerCase().includes(sq) ||
+            (o.sender||'').toLowerCase().includes(sq) ||
+            (o.message||'').toLowerCase().includes(sq) ||
+            (o.otp||'').includes(sq);
+
+        card.style.display = (countryOk && searchOk) ? '' : 'none';
+    });
+}
+
+// Called by filter UI — update state then apply CSS filter (no re-render)
+function renderOtps() {
+    activeCountryFilter = document.getElementById('otpCountryFilter').value;
+    activeSearchFilter  = document.getElementById('otpSearch').value || '';
+    applyFilter();
+}
+
+function makeOtpCard(o, isNew = false) {
+    const safe = str => (str || '').replace(/`/g, '\\`').replace(/\\/g, '\\\\').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeAttr = str => (str || '').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const otpBlock = o.otp ? `
+        <div class="otp-code-block" onclick="copyText('${safeAttr(o.otp)}', 'OTP')">
+            <div class="otp-code-label">🔑 OTP Code — Tap to Copy</div>
+            <div class="otp-code-val">${safe(o.otp)}</div>
+        </div>` : '';
+
+    return `
+    <div class="otp-card${isNew ? ' is-new' : ''}" data-id="${o.id}">
+        <div class="otp-top">
+            <div class="otp-country-info">
+                <span class="otp-flag">${o.flag || '🌍'}</span>
+                <span class="otp-country-name">${safe(o.country || 'Unknown')}</span>
+                <span class="otp-sender">${safe(o.sender || '')}</span>
+            </div>
+            <span class="otp-time">${safe(o.time || '')}</span>
+        </div>
+        ${otpBlock}
+        <div class="otp-number-row">
+            <span class="otp-num-label">📱 Number</span>
+            <span class="otp-num-val">${safe(o.masked_number || o.number || '—')}</span>
+        </div>
+        <div class="otp-msg">${safe(o.message)}</div>
+        <button class="otp-copy-btn" onclick="copyText(\`${safe(o.message)}\`, 'Message')">📋 Copy Full Message</button>
+    </div>`;
+}
+
+function updateOtpStats(todayOtps) {
+    // otpCount already set by updateTodayCount
+    document.getElementById('otpCntCount').textContent =
+        new Set((todayOtps || allOtps).map(o => o.country)).size;
+}
+
+function populateCountryFilter() {
+    const csel = document.getElementById('otpCountryFilter');
+    const cur  = csel.value;
+    const countries = [...new Set(allOtps.map(o => o.country).filter(Boolean))].sort();
+    csel.innerHTML = '<option value="all">🌍 All Countries</option>' +
+        countries.map(c => {
+            const flag = (allOtps.find(o => o.country === c) || {}).flag || '🌍';
+            return `<option value="${c}"${c === cur ? ' selected' : ''}>${flag} ${c}</option>`;
+        }).join('');
+}
+
+function updateCountryBadges() {
+    document.querySelectorAll('.country-card').forEach(card => {
+        const name = card.querySelector('.cc-name').textContent.trim().toLowerCase().split(' ')[0];
+        const cnt  = allOtps.filter(o => o.country && o.country.toLowerCase().includes(name)).length;
+        const badge = card.querySelector('.cc-otp-badge');
+        if (badge) {
+            if (cnt > 0) { badge.textContent = `🔑 ${cnt}`; badge.classList.add('visible'); }
+            else badge.classList.remove('visible');
+        }
+    });
+}
+
+function startOtpRefresh() {
+    stopOtpRefresh();
+    otpRefreshTimer = setInterval(() => {
+        if (!document.hidden) fetchOtps();
+    }, OTP_INTERVAL);
+}
+function stopOtpRefresh() {
+    if (otpRefreshTimer) { clearInterval(otpRefreshTimer); otpRefreshTimer = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopOtpRefresh();
+    else if (currentView === 'otps') { lastOtpFetch = 0; fetchOtps(); startOtpRefresh(); }
+});
+
+async function manualRefresh() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning');
+    lastOtpFetch = 0;
+    await fetchOtps();
+    setTimeout(() => btn.classList.remove('spinning'), 600);
+}
+
+// ===== MODAL — Independent fetch for specific number =====
+let modalNumber    = null;
+let modalRefreshTimer = null;
+const domModalIds  = new Set();  // track rendered modal OTP ids
+
+// Fetch OTPs specifically for this number — independent of main allOtps
+async function fetchModalOtps() {
+    if (!modalNumber) return;
+    try {
+        const r = await fetch(API_BASE + '/api/otps?limit=500');
+        const d = await r.json();
+        if (!d.success) return;
+
+        // Filter to this specific number only
+        const matches = d.otps.filter(o => o.number === modalNumber);
+        insertModalCards(matches);
+
+        // Update count label
+        const countEl = document.getElementById('modalOtpCount');
+        if (countEl) countEl.textContent = matches.length
+            ? `${matches.length} OTP${matches.length > 1 ? 's' : ''} received`
+            : '';
+
+        // Green dot = connected
+        const dot = document.getElementById('modalLiveDot');
+        if (dot) dot.style.background = 'var(--green)';
+
+    } catch(e) {
+        const dot = document.getElementById('modalLiveDot');
+        if (dot) dot.style.background = '#ef4444';
+    }
+}
+
+function insertModalCards(matches) {
+    const grid    = document.getElementById('modalOtpList');
+    const isFirst = domModalIds.size === 0;
+
+    const newItems = matches.filter(o => !domModalIds.has(o.id));
+
+    if (!newItems.length && isFirst) {
+        // First load, nothing yet
+        if (!grid.querySelector('.empty-state')) {
+            grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><h3>Waiting for OTPs on this number...</h3></div>';
+        }
+        return;
+    }
+
+    if (!newItems.length) return; // nothing new, DOM untouched
+
+    // Remove placeholder
+    const placeholder = grid.querySelector('.empty-state');
+    if (placeholder) placeholder.remove();
+
+    const frag = document.createDocumentFragment();
+    newItems.forEach(o => {
+        domModalIds.add(o.id);
+        const el = document.createElement('div');
+        el.innerHTML = makeOtpCard(o, !isFirst); // animate only if not first load
+        frag.appendChild(el.firstElementChild);
+    });
+    grid.insertBefore(frag, grid.firstChild);
+}
+
+async function manualModalRefresh() {
+    const btn = document.getElementById('modalRefreshBtn');
+    if (btn) btn.classList.add('spinning');
+    await fetchModalOtps();
+    setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 600);
+}
+
+function showNumberOtps(number, country, flag) {
+    modalNumber = number;
+    document.getElementById('modalTitle').innerHTML = `${flag} ${country}`;
+    document.getElementById('modalNum').textContent = number;
+    document.getElementById('modalOtpCount').textContent = '';
+
+    // Reset modal state for this number
+    domModalIds.clear();
+    document.getElementById('modalOtpList').innerHTML = '';
+
+    // Fetch immediately
+    fetchModalOtps();
+
+    document.getElementById('otpModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Auto-refresh every 4s — independent of main fetch throttle
+    if (modalRefreshTimer) clearInterval(modalRefreshTimer);
+    modalRefreshTimer = setInterval(fetchModalOtps, 4000);
+}
+
+function closeModal() {
+    document.getElementById('otpModal').classList.remove('open');
+    document.body.style.overflow = '';
+    modalNumber = null;
+    domModalIds.clear();
+    if (modalRefreshTimer) { clearInterval(modalRefreshTimer); modalRefreshTimer = null; }
+}
+document.getElementById('otpModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('otpModal')) closeModal();
+});
+document.addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+// ===== SEARCH =====
+function handleSearch() {
+    const q = document.getElementById('mainSearch').value.trim();
+    if (currentView === 'country') {
+        selectedCountry = null;
+        document.getElementById('viewCountry').classList.remove('active');
+        document.getElementById('viewHome').classList.add('active');
+        currentView = 'home';
+    }
+    if (currentView === 'home') renderCountries(q);
+}
+
+// ===== UTILS =====
+function copyText(text, label) {
+    navigator.clipboard.writeText(text).then(() => showNotif(`✅ ${label} copied!`)).catch(() => {
+        // Fallback for older mobile browsers
+        const el = document.createElement('textarea');
+        el.value = text; el.style.position = 'fixed'; el.style.opacity = '0';
+        document.body.appendChild(el); el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showNotif(`✅ ${label} copied!`);
+    });
+}
+
+function showNotif(msg) {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.classList.add('show');
+    clearTimeout(n._t);
+    n._t = setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+// ===== MIDNIGHT RESET SCHEDULER =====
+function scheduleMidnightReset() {
+    const now   = new Date();
+    const night = new Date();
+    night.setHours(24, 0, 5, 0); // 00:00:05 next day
+    const msUntilMidnight = night - now;
+
+    setTimeout(() => {
+        // Reset count
+        todayOtpCount = 0;
+        todayOtpDate  = getTodayStr();
+        localStorage.setItem('fn_today_count', '0');
+        localStorage.setItem('fn_today_date', getTodayStr());
+        document.getElementById('totalOtpsStat').textContent = '0';
+        document.getElementById('otpCount').textContent = '0';
+        // Schedule next midnight
+        scheduleMidnightReset();
+    }, msUntilMidnight);
+}
+
+// ===== INIT =====
+async function init() {
+    checkMidnightReset(); // reset if new day since last visit
+    applyLang();
+    setLang(lang);
+    scheduleMidnightReset();
+    await loadNumbers();
+    await fetchOtps();
+}
+
+init();
+</script>
+
+</body>
+</html>
+
+

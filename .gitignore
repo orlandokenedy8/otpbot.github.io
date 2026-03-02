@@ -1,0 +1,15 @@
+node_modules/
+otpbot.db
+otpbot.db-shm
+otpbot.db-wal
+*.db
+*.db-shm
+*.db-wal
+.env
+*.log
+used_numbers.txt
+fresh_numbers.txt
+freshnumbers.txt
+wa_auth/
+project.txt
+agents/
