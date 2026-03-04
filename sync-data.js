@@ -54,6 +54,15 @@ function fetchJSON(endpoint, outputFile) {
                         parsed.total = sampleNumbers.length;
                     }
 
+                    // IF fetching OTPs, restrict to only 1 OTP to prevent leaking the DB
+                    if (endpoint.includes('/otps') && parsed.success && parsed.otps) {
+                        parsed.real_total = parsed.otps.length;
+                        if (parsed.otps.length > 1) {
+                            parsed.otps = parsed.otps.slice(0, 1);
+                        }
+                        parsed.total = parsed.otps.length;
+                    }
+
                     // Minify the JSON by parsing and stringifying it without spaces
                     const minified = JSON.stringify(parsed);
 
