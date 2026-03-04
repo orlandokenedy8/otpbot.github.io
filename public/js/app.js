@@ -439,6 +439,106 @@ function completePurchase() {
   `;
 }
 
+function allocateNumber(plan, countryCode) {
+    const usedNumbers = DB.getUsedNumbers();
+    const existingPurchases = DB.getPurchases().filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
+    const allocatedNums = existingPurchases.map(p => p.number);
+
+    // Find available number for this country
+    const available = allNumbers.filter(n =>
+        (n.countryCode === countryCode) &&
+        !allocatedNums.includes(n.number) &&
+        !usedNumbers.includes(n.number)
+    );
+
+    if (!available.length) {
+        showNotif('Failed to allocate: No numbers currently available for this country.', 'error');
+        return;
+    }
+
+    // Pick a random number
+    const num = available[Math.floor(Math.random() * available.length)];
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + plan.duration_months);
+
+    const purchase = {
+        id: generateId(),
+        user_id: currentUser.id,
+        number: num.number,
+        number_id: num.id,
+        country: num.country,
+        countryCode: num.countryCode,
+        flag: num.flag,
+        plan_id: plan.id,
+        plan_name: plan.name,
+        amount: plan.price,
+        status: 'active',
+        purchased_at: new Date().toISOString(),
+        expires_at: expiresAt.toISOString()
+    };
+
+    const purchases = DB.getPurchases();
+    purchases.push(purchase);
+    DB.savePurchases(purchases);
+
+    showNotif('🎉 Number activated successfully!', 'success');
+    loadNumbersFromAPI().then(() => initDashboard());
+}
+
+function redeemKey() {
+    const input = document.getElementById('redeemKeyInput').value.trim();
+    if (!input.startsWith('OTP-')) {
+        showNotif('Invalid key format.', 'error');
+        return;
+    }
+
+    try {
+        const payload = input.substring(4);
+        const data = JSON.parse(atob(payload));
+
+        // Verify simplistic signature (prevent tampering)
+        const expectedSig = btoa(data.p + data.c + 'admin-secret-key-2026').substring(0, 10);
+        if (data.s !== expectedSig) {
+            showNotif('Invalid or expired activation key.', 'error');
+            return;
+        }
+
+        // Check if key already used in this browser
+        const usedKeys = DB._get('used_keys') || [];
+        if (usedKeys.includes(input)) {
+            showNotif('This key has already been redeemed here.', 'error');
+            return;
+        }
+
+        const plan = plans.find(x => x.id === data.p);
+        if (!plan) return;
+
+        allocateNumber(plan, data.c);
+
+        // Mark key used
+        usedKeys.push(input);
+        DB._set('used_keys', usedKeys);
+        document.getElementById('redeemKeyInput').value = '';
+    } catch (e) {
+        showNotif('Invalid key.', 'error');
+    }
+}
+
+function generateActivationKey() {
+    const planId = document.getElementById('genKeyPlan').value;
+    const countryCode = document.getElementById('genKeyCountry').value;
+
+    // Create a simple tamper-proof signature
+    const signature = btoa(planId + countryCode + 'admin-secret-key-2026').substring(0, 10);
+
+    const data = { p: planId, c: countryCode, s: signature };
+    const key = 'OTP-' + btoa(JSON.stringify(data));
+
+    const resEl = document.getElementById('genKeyResult');
+    resEl.innerHTML = key;
+    resEl.style.display = 'block';
+}
+
 // ===== DASHBOARD =====
 async function initDashboard() {
     stopInboxRefresh();

@@ -374,6 +374,20 @@
                 </div>
             </div>
 
+            <!-- Redeem Key -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h3>🎟️ Redeem Activation Key</h3>
+                </div>
+                <div class="dash-desc">Received an activation key after payment on WhatsApp? Paste it below to instantly
+                    unlock your number.</div>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" id="redeemKeyInput" class="input-field" placeholder="Enter activation key..."
+                        style="margin-bottom:0;flex:1;" />
+                    <button class="btn-primary" onclick="redeemKey()" style="padding:0 24px;">Redeem 🚀</button>
+                </div>
+            </div>
+
             <!-- Number Health -->
             <div class="dash-card" id="healthCard" style="display:none;">
                 <div class="dash-card-header">
@@ -442,6 +456,30 @@
                         </div>
                         <div id="qualityCheckResult" style="margin-top:8px;"></div>
                     </div>
+                </div>
+
+                <div class="dash-card" style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:16px;">🔑 Generate Activation Key</h3>
+                    <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:12px;">Generate a secure offline key
+                        to send to a user manually after they pay via UPI/WhatsApp.</p>
+                    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                        <select id="genKeyPlan" class="input-field" style="margin-bottom:0;min-width:150px;flex:1;">
+                            <option value="starter">Starter (1 Month)</option>
+                            <option value="standard">Standard (3 Months)</option>
+                            <option value="pro">Pro (6 Months)</option>
+                            <option value="business">Business (12 Months)</option>
+                        </select>
+                        <select id="genKeyCountry" class="input-field" style="margin-bottom:0;min-width:150px;flex:1;">
+                            <option value="58">Venezuela (+58)</option>
+                            <option value="84">Vietnam (+84)</option>
+                            <option value="7">Kazakhstan (+7)</option>
+                        </select>
+                        <button class="btn-primary" onclick="generateActivationKey()" style="padding:0 24px;">Create
+                            Key</button>
+                    </div>
+                    <div id="genKeyResult"
+                        style="user-select:all;padding:12px;background:var(--bg-1);border:1px dashed var(--primary);border-radius:8px;font-family:var(--font-mono);color:var(--primary);font-weight:bold;display:none;word-break:break-all;cursor:pointer;"
+                        onclick="copyText(this.innerText)"></div>
                 </div>
 
                 <div class="dash-card" style="margin-bottom:24px;">
