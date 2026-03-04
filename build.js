@@ -52,9 +52,8 @@ async function build() {
         numbersToExpressions: true,
         renameGlobals: false, // Must be false so HTML onclicks still work
         selfDefending: true,
-        simplify: true,
-        splitStrings: true,
-        splitStringsChunkLength: 10,
+        simplify: false,
+        splitStrings: false,
         stringArray: true,
         stringArrayCallsTransform: true,
         stringArrayCallsTransformThreshold: 0.5,
