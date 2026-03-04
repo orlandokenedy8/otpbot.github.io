@@ -373,11 +373,11 @@ function completePurchase() {
     btn.disabled = true;
     btn.innerHTML = '<div class="loader" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Processing...';
 
+    // Verify number availability before taking payment
     const usedNumbers = DB.getUsedNumbers();
     const existingPurchases = DB.getPurchases().filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
     const allocatedNums = existingPurchases.map(p => p.number);
 
-    // Find available number for this country
     const available = allNumbers.filter(n =>
         (n.countryCode === countryCode) &&
         !allocatedNums.includes(n.number) &&
@@ -391,57 +391,53 @@ function completePurchase() {
         return;
     }
 
-    // Pick a random number
-    const num = available[Math.floor(Math.random() * available.length)];
-    const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + selectedPlan.duration_months);
+    // Define UPI and WhatsApp details (Change these to your real ones later)
+    const upiID = 'otpbot@ybl'; // Replace with real UPI ID
+    const waNumber = '919000000000'; // Replace with actual WhatsApp number
+    const amount = selectedPlan.price;
 
-    const purchase = {
-        id: generateId(),
-        user_id: currentUser.id,
-        number: num.number,
-        number_id: num.id,
-        country: num.country,
-        countryCode: num.countryCode,
-        flag: num.flag,
-        plan_id: selectedPlan.id,
-        plan_name: selectedPlan.name,
-        amount: selectedPlan.price,
-        status: 'active',
-        purchased_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString()
-    };
+    // Generate Direct UPI Deep Link
+    const upiLink = `upi://pay?pa=${upiID}&pn=OTPBot+Premium&am=${amount}&cu=INR`;
 
-    const purchases = DB.getPurchases();
-    purchases.push(purchase);
-    DB.savePurchases(purchases);
+    // Generate WhatsApp Pre-filled Message Link
+    const waText = encodeURIComponent(`Hi OTPBot! I want to purchase the ${selectedPlan.name} plan for ₹${amount}.\n\nMy account email: ${currentUser.email}\nCountry selected: ${available[0].country}\n\nHere is my successful payment screenshot:`);
+    const waLink = `https://wa.me/${waNumber}?text=${waText}`;
 
-    // Show success
+    // Show Payment UI
     document.querySelector('.modal-form').style.display = 'none';
     document.getElementById('modalResult').style.display = 'block';
     document.getElementById('modalResult').innerHTML = `
     <div style="text-align:center;">
-      <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
-      <h3 style="margin-bottom:12px;color:var(--success);">Purchase Successful!</h3>
-      <p style="color:var(--text-2);margin-bottom:4px;">Your assigned number:</p>
-      <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;letter-spacing:1px;">${num.flag} +${num.number}</div>
-      <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:16px;">
-        ${num.country} · ${selectedPlan.name} Plan · Expires: ${expiresAt.toLocaleDateString()}
-      </p>
-      <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
-        <p style="color:var(--text-1);font-weight:600;margin-bottom:8px;">🔍 Verify your number before using:</p>
-        <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:12px;">Click below to check if this number is already registered on WhatsApp.</p>
-        <a href="https://wa.me/+${num.number}" target="_blank" style="display:inline-block;padding:10px 20px;background:rgba(37,211,102,0.15);color:#25d366;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;border:1px solid rgba(37,211,102,0.3);">
-          🔗 Check on WhatsApp
+      <h3 style="margin-bottom:8px;color:var(--text-1);">Secure UPI Payment</h3>
+      <p style="color:var(--text-2);margin-bottom:20px;font-size:0.95rem;">You are purchasing the <strong>${selectedPlan.name}</strong> plan.</p>
+      
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
+            <div style="font-size:2rem;font-weight:800;color:var(--primary);">₹${amount}</div>
+        </div>
+        <p style="margin-bottom:16px;font-size:0.9rem;font-weight:600;color:var(--text-1);">Step 1: Pay using any UPI app</p>
+        <a href="${upiLink}" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-bottom:16px;background:#6739B7;box-shadow:0 4px 15px rgba(103,57,183,0.3);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          Open GPay / PhonePe / Paytm
+        </a>
+        <p style="color:var(--text-3);font-size:0.85rem;margin:0;">Or copy UPI ID: <br><strong style="color:var(--text-1);user-select:all;cursor:pointer;background:var(--bg-1);padding:4px 8px;border-radius:4px;display:inline-block;margin-top:6px;" onclick="copyText('${upiID}')">${upiID} 📋</strong></p>
+      </div>
+
+      <div style="background:var(--bg-2);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:#25D366;"></div>
+        <p style="margin-bottom:8px;font-size:0.9rem;font-weight:600;color:var(--text-1);">Step 2: Verify Payment</p>
+        <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:16px;line-height:1.5;">After paying, attach your screenshot and send the pre-filled message on WhatsApp. We'll activate your number instantly!</p>
+        <a href="${waLink}" target="_blank" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25D366;color:#111;box-shadow:0 4px 15px rgba(37,211,102,0.2);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          Send Proof via WhatsApp
         </a>
       </div>
-      <button class="btn-primary btn-full" onclick="closePurchaseModal(); showPage('dashboard');">
-        Go to Dashboard →
+
+      <button style="background:transparent;border:none;color:var(--text-3);font-size:0.9rem;cursor:pointer;text-decoration:underline;" onclick="closePurchaseModal();">
+        Cancel Purchase
       </button>
     </div>
   `;
-    showNotif('🎉 Number purchased successfully!', 'success');
-    loadNumbersFromAPI(); // Refresh available counts
 }
 
 // ===== DASHBOARD =====
