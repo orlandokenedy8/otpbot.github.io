@@ -338,19 +338,13 @@ async function loadNumbersFromAPI() {
         const data = await res.json();
         if (data.success && data.numbers) {
             allNumbers = data.numbers;
-            // Extract unique countries
+            // Extract unique countries — always show all countries since real_total represents true availability
             const countryMap = {};
-            const usedNumbers = DB.getUsedNumbers();
-            const purchases = DB.getPurchases().filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
-            const allocatedNumbers = purchases.map(p => p.number);
 
-            allNumbers.forEach(n => {
-                if (!allocatedNumbers.includes(n.number) && !usedNumbers.includes(n.number)) {
-                    const key = n.countryCode || n.country;
-                    if (!countryMap[key]) {
-                        countryMap[key] = { country: n.country, countryCode: n.countryCode, flag: n.flag, available: n.real_total || 0 };
-                    }
-                    if (!n.real_total) countryMap[key].available++;
+            allNumbers.forEach(function (n) {
+                var key = n.countryCode || n.country;
+                if (!countryMap[key]) {
+                    countryMap[key] = { country: n.country, countryCode: n.countryCode, flag: n.flag, available: n.real_total || 1 };
                 }
             });
             countries = Object.values(countryMap);
