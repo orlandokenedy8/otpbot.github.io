@@ -497,7 +497,7 @@ function redeemKey() {
         const data = JSON.parse(atob(payload));
 
         // Verify simplistic signature (prevent tampering)
-        const expectedSig = btoa(data.p + data.c + 'admin-secret-key-2026').substring(0, 10);
+        const expectedSig = btoa(data.p + data.c + (data.z || '') + 'admin-secret-key-2026').substring(0, 10);
         if (data.s !== expectedSig) {
             showNotif('Invalid or expired activation key.', 'error');
             return;
@@ -528,10 +528,13 @@ function generateActivationKey() {
     const planId = document.getElementById('genKeyPlan').value;
     const countryCode = document.getElementById('genKeyCountry').value;
 
-    // Create a simple tamper-proof signature
-    const signature = btoa(planId + countryCode + 'admin-secret-key-2026').substring(0, 10);
+    // Create a random salt so identical purchases create unique keys
+    const salt = Math.random().toString(36).substring(2, 8);
 
-    const data = { p: planId, c: countryCode, s: signature };
+    // Create a simple tamper-proof signature
+    const signature = btoa(planId + countryCode + salt + 'admin-secret-key-2026').substring(0, 10);
+
+    const data = { p: planId, c: countryCode, z: salt, s: signature };
     const key = 'OTP-' + btoa(JSON.stringify(data));
 
     const resEl = document.getElementById('genKeyResult');
