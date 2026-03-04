@@ -241,7 +241,7 @@ function toggleFaq(el) { el.classList.toggle('open'); }
 // ===== LOAD DATA STATICALLY (VIA ACTIONS SYNC) =====
 async function loadNumbersFromAPI() {
     try {
-        const res = await fetch('data/numbers.json');
+        const res = await fetch(`data/numbers.json?t=${new Date().getTime()}`);
         const data = await res.json();
         if (data.success && data.numbers) {
             allNumbers = data.numbers;
@@ -269,7 +269,7 @@ async function loadNumbersFromAPI() {
 
 async function loadOtpsFromAPI() {
     try {
-        const res = await fetch('data/otps.json');
+        const res = await fetch(`data/otps.json?t=${new Date().getTime()}`);
         const data = await res.json();
         if (data.success && data.otps) allOtps = data.otps;
     } catch (e) {
