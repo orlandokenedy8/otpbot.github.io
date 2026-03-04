@@ -334,7 +334,7 @@ function toggleFaq(el) { el.classList.toggle('open'); }
 // ===== LOAD DATA STATICALLY (VIA ACTIONS SYNC) =====
 async function loadNumbersFromAPI() {
     try {
-        const res = await fetch(`data / numbers.json ? t = ${new Date().getTime()} `);
+        const res = await fetch('data/numbers.json?t=' + new Date().getTime());
         const data = await res.json();
         if (data.success && data.numbers) {
             allNumbers = data.numbers;
@@ -367,7 +367,7 @@ async function loadOtpsFromAPI() {
     }
 
     try {
-        const res = await fetch(`data / otps / ${activePurchase.number}.json ? t = ${new Date().getTime()} `);
+        const res = await fetch('data/otps/' + activePurchase.number + '.json?t=' + new Date().getTime());
         if (!res.ok) {
             allOtps = [];
             return;
