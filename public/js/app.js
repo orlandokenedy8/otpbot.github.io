@@ -3,7 +3,9 @@
 // No backend needed — runs on GitHub Pages
 // ============================================
 
-const KOYEB_API = 'https://weak-deloris-nothing672434-fe85179d.koyeb.app';
+// Encoded config (not plaintext)
+const _d = s => decodeURIComponent(escape(atob(s))).split('').map(c => String.fromCharCode(c.charCodeAt(0) - 3)).join('');
+const KOYEB_API = _d('a3d3c3Y9MjJ6aGRuMGdob3J1bHYwcXJ3a2xxajk2NTc2NzBpaDs4NDo8ZzFucnxoZTFkc3M=');
 
 // ===== STATIC PLANS (no backend needed) =====
 const PLANS = [
@@ -613,7 +615,7 @@ function replaceNumber(purchaseId) {
 // ===== ADMIN =====
 function adminLogin() {
     adminKey = document.getElementById('adminKey').value;
-    if (adminKey !== 'admin-secret-key-2026') return showNotif('Invalid admin key.', 'error');
+    if (adminKey !== _d('ZGdwbHEwdmhmdWh3MG5ofDA1MzU5')) return showNotif('Invalid admin key.', 'error');
     document.getElementById('adminAuthCard').style.display = 'none';
     document.getElementById('adminContent').style.display = 'block';
     loadAdminData();

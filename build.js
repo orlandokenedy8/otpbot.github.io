@@ -3,6 +3,7 @@
 // ============================================
 
 const { minify } = require('terser');
+const JavaScriptObfuscator = require('javascript-obfuscator');
 const CleanCSS = require('clean-css');
 const fs = require('fs');
 const path = require('path');
@@ -36,11 +37,44 @@ async function build() {
         return;
     }
 
-    fs.writeFileSync(path.join(__dirname, 'public', 'js', 'app.min.js'), jsResult.code);
+    // Obfuscate after minifying
+    const obfResult = JavaScriptObfuscator.obfuscate(jsResult.code, {
+        compact: true,
+        controlFlowFlattening: true,
+        controlFlowFlatteningThreshold: 0.75,
+        deadCodeInjection: true,
+        deadCodeInjectionThreshold: 0.4,
+        debugProtection: false,
+        debugProtectionInterval: 0,
+        disableConsoleOutput: true,
+        identifierNamesGenerator: 'hexadecimal',
+        log: false,
+        numbersToExpressions: true,
+        renameGlobals: false, // Must be false so HTML onclicks still work
+        selfDefending: true,
+        simplify: true,
+        splitStrings: true,
+        splitStringsChunkLength: 10,
+        stringArray: true,
+        stringArrayCallsTransform: true,
+        stringArrayCallsTransformThreshold: 0.5,
+        stringArrayEncoding: ['base64'],
+        stringArrayIndexShift: true,
+        stringArrayRotate: true,
+        stringArrayShuffle: true,
+        stringArrayWrappersCount: 1,
+        stringArrayWrappersChainedCalls: true,
+        stringArrayWrappersParametersMaxCount: 2,
+        stringArrayWrappersType: 'variable',
+        stringArrayThreshold: 0.75,
+        unicodeEscapeSequence: false
+    });
+
+    fs.writeFileSync(path.join(__dirname, 'public', 'js', 'app.min.js'), obfResult.getObfuscatedCode());
 
     const jsOrigSize = Buffer.byteLength(jsSource);
-    const jsMinSize = Buffer.byteLength(jsResult.code);
-    console.log(`✅ JS: ${(jsOrigSize / 1024).toFixed(1)}KB → ${(jsMinSize / 1024).toFixed(1)}KB (${Math.round((1 - jsMinSize / jsOrigSize) * 100)}% smaller)`);
+    const jsMinSize = Buffer.byteLength(obfResult.getObfuscatedCode());
+    console.log(`✅ JS: ${(jsOrigSize / 1024).toFixed(1)}KB → ${(jsMinSize / 1024).toFixed(1)}KB (Obfuscated)`);
 
     // ===== MINIFY CSS =====
     const cssSource = fs.readFileSync(path.join(__dirname, 'public', 'css', 'styles.css'), 'utf8');
