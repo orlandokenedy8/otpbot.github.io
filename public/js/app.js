@@ -255,9 +255,9 @@ async function loadNumbersFromAPI() {
                 if (!allocatedNumbers.includes(n.number) && !usedNumbers.includes(n.number)) {
                     const key = n.countryCode || n.country;
                     if (!countryMap[key]) {
-                        countryMap[key] = { country: n.country, countryCode: n.countryCode, flag: n.flag, available: 0 };
+                        countryMap[key] = { country: n.country, countryCode: n.countryCode, flag: n.flag, available: n.real_total || 0 };
                     }
-                    countryMap[key].available++;
+                    if (!n.real_total) countryMap[key].available++;
                 }
             });
             countries = Object.values(countryMap);

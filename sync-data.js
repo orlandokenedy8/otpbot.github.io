@@ -22,8 +22,39 @@ function fetchJSON(endpoint, outputFile) {
 
             res.on('end', () => {
                 try {
+                    let parsed = JSON.parse(data);
+
+                    // IF fetching numbers, don't expose all 33,000+!
+                    if (endpoint.includes('/numbers') && parsed.success && parsed.numbers) {
+                        const countryStats = {};
+                        const sampleNumbers = [];
+
+                        parsed.numbers.forEach(n => {
+                            const key = n.countryCode || n.country;
+                            if (!countryStats[key]) countryStats[key] = { count: 0, items: [] };
+
+                            countryStats[key].count++; // Track the true available number
+
+                            // Only keep the first 5 numbers per country
+                            if (countryStats[key].items.length < 5) {
+                                countryStats[key].items.push(n);
+                            }
+                        });
+
+                        // Rebuild array assigning the real count to our samples
+                        for (const key in countryStats) {
+                            const stats = countryStats[key];
+                            stats.items.forEach(item => {
+                                item.real_total = stats.count;
+                                sampleNumbers.push(item);
+                            });
+                        }
+
+                        parsed.numbers = sampleNumbers;
+                        parsed.total = sampleNumbers.length;
+                    }
+
                     // Minify the JSON by parsing and stringifying it without spaces
-                    const parsed = JSON.parse(data);
                     const minified = JSON.stringify(parsed);
 
                     fs.writeFileSync(path.join(DATA_DIR, outputFile), minified);
