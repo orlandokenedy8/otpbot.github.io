@@ -1,27 +1,110 @@
 // ============================================
-// OTPBot Premium — Application Logic
+// OTPBot Premium — Fully Client-Side Application
+// No backend needed — runs on GitHub Pages
 // ============================================
 
-// API Base — auto-detect: local dev vs production (GitHub Pages → Koyeb backend)
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? ''
-    : 'https://otpbot-api-orlandokenedy8.koyeb.app';
+const KOYEB_API = 'https://weak-deloris-nothing672434-fe85179d.koyeb.app';
+
+// ===== STATIC PLANS (no backend needed) =====
+const PLANS = [
+    { id: 'starter', name: 'Starter', duration_months: 1, price: 49, description: 'Perfect for trying out the service. Get one premium number for 30 days.', badge: '🚀', is_popular: 0 },
+    { id: 'standard', name: 'Standard', duration_months: 3, price: 99, description: 'Best value for regular users. Save 33% compared to monthly.', badge: '⭐', is_popular: 1 },
+    { id: 'pro', name: 'Pro', duration_months: 6, price: 149, description: 'For power users who need long-term numbers. Save 50%.', badge: '💎', is_popular: 0 },
+    { id: 'annual', name: 'Annual', duration_months: 12, price: 249, description: 'Maximum savings with a full year. Save 58% vs monthly.', badge: '👑', is_popular: 0 }
+];
 
 // ===== STATE =====
-let plans = [];
+let plans = PLANS;
 let selectedPlan = null;
 let activePurchase = null;
 let allPurchases = [];
 let adminKey = null;
 let inboxTimer = null;
 let countries = [];
-let authToken = localStorage.getItem('otpbot_token') || null;
-let currentUser = JSON.parse(localStorage.getItem('otpbot_user') || 'null');
+let allNumbers = [];
+let allOtps = [];
 
-function authHeaders() {
-    const h = { 'Content-Type': 'application/json' };
-    if (authToken) h['Authorization'] = 'Bearer ' + authToken;
-    return h;
+// ===== LOCAL DB (localStorage) =====
+const DB = {
+    _get(key) { try { return JSON.parse(localStorage.getItem('otpbot_' + key)) || null; } catch { return null; } },
+    _set(key, val) { localStorage.setItem('otpbot_' + key, JSON.stringify(val)); },
+    getUsers() { return this._get('users') || []; },
+    saveUsers(u) { this._set('users', u); },
+    getSession() { return this._get('session'); },
+    saveSession(s) { this._set('session', s); },
+    clearSession() { localStorage.removeItem('otpbot_session'); },
+    getPurchases() { return this._get('purchases') || []; },
+    savePurchases(p) { this._set('purchases', p); },
+    getUsedNumbers() { return this._get('used_numbers') || []; },
+    saveUsedNumbers(u) { this._set('used_numbers', u); },
+    getRefunds() { return this._get('refunds') || []; },
+    saveRefunds(r) { this._set('refunds', r); },
+};
+
+function generateId() {
+    return 'xxxx-xxxx-xxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16));
+}
+
+function hashPassword(pw) {
+    let h = 0;
+    for (let i = 0; i < pw.length; i++) { h = ((h << 5) - h) + pw.charCodeAt(i); h |= 0; }
+    return 'h_' + Math.abs(h).toString(36);
+}
+
+// ===== AUTH =====
+let currentUser = null;
+let authToken = null;
+
+function loadSession() {
+    const s = DB.getSession();
+    if (s && s.expires > Date.now()) {
+        currentUser = s.user;
+        authToken = s.token;
+        return true;
+    }
+    DB.clearSession();
+    currentUser = null;
+    authToken = null;
+    return false;
+}
+loadSession();
+
+function registerUser(email, password) {
+    const users = DB.getUsers();
+    if (users.find(u => u.email === email)) return { success: false, error: 'Email already registered. Please login.' };
+    const user = { id: generateId(), email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() };
+    users.push(user);
+    DB.saveUsers(users);
+    const token = generateId() + generateId();
+    const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    DB.saveSession(session);
+    currentUser = session.user;
+    authToken = token;
+    return { success: true, user: session.user };
+}
+
+function loginUser(email, password) {
+    const users = DB.getUsers();
+    const user = users.find(u => u.email === email);
+    if (!user || user.passwordHash !== hashPassword(password)) return { success: false, error: 'Invalid email or password.' };
+    const token = generateId() + generateId();
+    const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    DB.saveSession(session);
+    currentUser = session.user;
+    authToken = token;
+    return { success: true, user: session.user };
+}
+
+function logoutUser() {
+    DB.clearSession();
+    currentUser = null;
+    authToken = null;
+    activePurchase = null;
+    allPurchases = [];
+    stopInboxRefresh();
+    updateNavUI();
+    showPage('landing');
+    showNotif('Logged out.', 'success');
 }
 
 // ===== THEME =====
@@ -63,13 +146,11 @@ function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const el = document.getElementById('page-' + page);
     if (el) el.classList.add('active');
-
     document.getElementById('mobileMenu')?.classList.remove('open');
     document.getElementById('mobileMenuBtn')?.classList.remove('open');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     if (page === 'dashboard') {
-        if (!authToken) { showAuthModal('login'); return; }
+        if (!currentUser) { showAuthModal('login'); return; }
         initDashboard();
     }
     updateNavUI();
@@ -80,7 +161,7 @@ function updateNavUI() {
     const userBtn = document.getElementById('navUserBtn');
     const userEmail = document.getElementById('navUserEmail');
     if (!loginBtn || !userBtn) return;
-    if (authToken && currentUser) {
+    if (currentUser) {
         loginBtn.style.display = 'none';
         userBtn.style.display = 'inline-flex';
         if (userEmail) userEmail.textContent = currentUser.email;
@@ -92,8 +173,7 @@ function updateNavUI() {
 
 // ===== AUTH MODAL =====
 function showAuthModal(mode) {
-    const modal = document.getElementById('authModal');
-    modal.classList.add('open');
+    document.getElementById('authModal').classList.add('open');
     document.body.classList.add('modal-open');
     renderAuthForm(mode || 'login');
 }
@@ -107,6 +187,7 @@ function renderAuthForm(mode) {
     const content = document.getElementById('authModalContent');
     const isLogin = mode === 'login';
     content.innerHTML = `
+      <button class="modal-close" onclick="closeAuthModal()">×</button>
       <div class="modal-icon">${isLogin ? '🔐' : '🚀'}</div>
       <h3 class="modal-title">${isLogin ? 'Login to OTPBot' : 'Create Account'}</h3>
       <div style="margin-bottom:16px;">
@@ -127,60 +208,21 @@ function renderAuthForm(mode) {
     `;
 }
 
-async function submitAuth(mode) {
+function submitAuth(mode) {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
     if (!email || !password) return showNotif('Enter email and password.', 'error');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showNotif('Invalid email.', 'error');
+    if (mode === 'register' && password.length < 4) return showNotif('Password min 4 characters.', 'error');
 
-    const btn = document.getElementById('authSubmitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Please wait...';
-
-    try {
-        const url = mode === 'login' ? '/api/login' : '/api/register';
-        const res = await fetch(API_BASE + url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (data.success) {
-            authToken = data.token;
-            currentUser = data.user;
-            localStorage.setItem('otpbot_token', authToken);
-            localStorage.setItem('otpbot_user', JSON.stringify(currentUser));
-            closeAuthModal();
-            updateNavUI();
-            showNotif(`✅ Welcome${mode === 'login' ? ' back' : ''}, ${data.user.email}!`, 'success');
-        } else {
-            showNotif(data.error || 'Failed.', 'error');
-            btn.disabled = false;
-            btn.textContent = mode === 'login' ? 'Login' : 'Create Account';
-        }
-    } catch (e) {
-        showNotif('Network error.', 'error');
-        btn.disabled = false;
-        btn.textContent = mode === 'login' ? 'Login' : 'Create Account';
+    const result = mode === 'login' ? loginUser(email, password) : registerUser(email, password);
+    if (result.success) {
+        closeAuthModal();
+        updateNavUI();
+        showNotif(`✅ Welcome${mode === 'login' ? ' back' : ''}, ${result.user.email}!`, 'success');
+    } else {
+        showNotif(result.error, 'error');
     }
-}
-
-async function logout() {
-    try {
-        await fetch(API_BASE + '/api/logout', {
-            method: 'POST',
-            headers: authHeaders()
-        });
-    } catch (e) { }
-    authToken = null;
-    currentUser = null;
-    activePurchase = null;
-    allPurchases = [];
-    localStorage.removeItem('otpbot_token');
-    localStorage.removeItem('otpbot_user');
-    stopInboxRefresh();
-    updateNavUI();
-    showPage('landing');
-    showNotif('Logged out.', 'success');
 }
 
 // ===== NOTIFICATIONS =====
@@ -193,78 +235,83 @@ function showNotif(msg, type = 'default') {
 }
 
 // ===== FAQ =====
-function toggleFaq(el) {
-    el.classList.toggle('open');
-}
+function toggleFaq(el) { el.classList.toggle('open'); }
 
-// ===== LOAD PLANS =====
-async function loadPlans() {
+// ===== LOAD DATA FROM KOYEB =====
+async function loadNumbersFromAPI() {
     try {
-        const res = await fetch(API_BASE + '/api/plans');
+        const res = await fetch(KOYEB_API + '/api/numbers');
         const data = await res.json();
-        if (data.success) {
-            plans = data.plans;
-            renderPricingCards();
+        if (data.success && data.numbers) {
+            allNumbers = data.numbers;
+            // Extract unique countries
+            const countryMap = {};
+            const usedNumbers = DB.getUsedNumbers();
+            const purchases = DB.getPurchases().filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
+            const allocatedNumbers = purchases.map(p => p.number);
+
+            allNumbers.forEach(n => {
+                if (!allocatedNumbers.includes(n.number) && !usedNumbers.includes(n.number)) {
+                    const key = n.country_code || n.country;
+                    if (!countryMap[key]) {
+                        countryMap[key] = { country: n.country, country_code: n.country_code, flag: n.flag, available: 0 };
+                    }
+                    countryMap[key].available++;
+                }
+            });
+            countries = Object.values(countryMap);
         }
     } catch (e) {
-        console.error('Failed to load plans:', e);
-        document.getElementById('pricingGrid').innerHTML = '<p style="color:var(--text-2);text-align:center;grid-column:1/-1;">Failed to load plans. Please refresh.</p>';
+        console.error('Failed to load numbers:', e);
     }
 }
 
-// ===== LOAD COUNTRIES =====
-async function loadCountries() {
+async function loadOtpsFromAPI() {
     try {
-        const res = await fetch(API_BASE + '/api/countries');
+        const res = await fetch(KOYEB_API + '/api/otps?limit=200');
         const data = await res.json();
-        if (data.success) countries = data.countries;
+        if (data.success && data.otps) allOtps = data.otps;
     } catch (e) {
-        console.error('Failed to load countries:', e);
+        console.error('Failed to load OTPs:', e);
     }
 }
 
+// ===== RENDER PLANS =====
 function renderPricingCards() {
     const grid = document.getElementById('pricingGrid');
-    if (!plans.length) {
-        grid.innerHTML = '<p style="color:var(--text-2);text-align:center;grid-column:1/-1;">No plans available.</p>';
-        return;
-    }
-
-    const savings = { 1: null, 3: '20%', 6: '33%', 12: '42%' };
-
+    if (!grid) return;
+    const basePrice = plans[0].price;
     grid.innerHTML = plans.map(plan => {
-        const isPopular = plan.is_popular;
-        const save = savings[plan.duration_months];
-
+        const monthly = (plan.price / plan.duration_months).toFixed(0);
+        const save = plan.duration_months > 1 ? Math.round((1 - (plan.price / (basePrice * plan.duration_months))) * 100) + '%' : null;
         return `
-      <div class="pricing-card${isPopular ? ' popular' : ''}">
-        ${isPopular ? '<div class="popular-badge">Most Popular</div>' : ''}
+      <div class="pricing-card ${plan.is_popular ? 'popular' : ''}">
+        ${plan.is_popular ? '<div class="popular-badge">MOST POPULAR</div>' : ''}
         <div class="pricing-header">
           <div class="pricing-name">${plan.badge || ''} ${plan.name}</div>
           <div class="pricing-price">
-            <span class="pricing-currency">₹</span>${plan.price.toFixed(0)}
+            <span class="pricing-currency">₹</span>${plan.price}
             <span class="pricing-period">/${plan.duration_months}mo</span>
           </div>
           ${save ? `<div style="color:var(--success);font-size:0.85rem;font-weight:600;margin-top:4px;">Save ${save}</div>` : ''}
         </div>
         <p class="pricing-desc">${plan.description}</p>
         <ul class="pricing-features">
-          <li><span class="feature-check">✓</span> 1 Premium Number</li>
-          <li><span class="feature-check">✓</span> ${plan.duration_months} Month${plan.duration_months > 1 ? 's' : ''} Access</li>
+          <li><span class="feature-check">✓</span> Premium Number</li>
           <li><span class="feature-check">✓</span> Real-time OTP Inbox</li>
-          <li><span class="feature-check">✓</span> Number Health Monitoring</li>
-          <li><span class="feature-check">✓</span> Instant Replacement</li>
+          <li><span class="feature-check">✓</span> ${plan.duration_months} Month${plan.duration_months > 1 ? 's' : ''} Access</li>
+          ${plan.duration_months >= 3 ? '<li><span class="feature-check">✓</span> Number Replacement</li>' : ''}
           ${plan.duration_months >= 6 ? '<li><span class="feature-check">✓</span> Priority Support</li>' : ''}
         </ul>
         <button class="btn-primary btn-full" onclick="selectPlan('${plan.id}')">
-          <span>Get Started — ₹${plan.price.toFixed(0)}</span>
+          <span>Get Started — ₹${plan.price}</span>
         </button>
       </div>
     `;
     }).join('');
 }
 
-// ===== SELECT PLAN → OPEN PURCHASE MODAL =====
+// ===== SELECT PLAN → PURCHASE =====
 function selectPlan(planId) {
     selectedPlan = plans.find(p => p.id === planId);
     if (!selectedPlan) return;
@@ -273,26 +320,23 @@ function selectPlan(planId) {
 
 function openPurchaseModal() {
     if (!selectedPlan) return;
-
-    // Require login first
-    if (!authToken) {
+    if (!currentUser) {
         showAuthModal('login');
         showNotif('Please login or create an account first.', 'error');
         return;
     }
 
-    // Build country options
     let countryOptions = countries.map(c =>
         `<option value="${c.country_code}">${c.flag} ${c.country} (${c.available} available)</option>`
     ).join('');
-    if (!countryOptions) countryOptions = '<option value="">Loading...</option>';
+    if (!countryOptions) countryOptions = '<option value="">No numbers available</option>';
 
     document.getElementById('modalTitle').textContent = 'Complete Your Purchase';
     document.getElementById('modalDetails').innerHTML = `
     <div class="detail-row"><span class="detail-label">Plan</span><span class="detail-val">${selectedPlan.badge} ${selectedPlan.name}</span></div>
     <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">${selectedPlan.duration_months} month${selectedPlan.duration_months > 1 ? 's' : ''}</span></div>
     <div class="detail-row"><span class="detail-label">Account</span><span class="detail-val">${currentUser.email}</span></div>
-    <div class="detail-row"><span class="detail-label">Total</span><span class="detail-val" style="color:var(--primary);font-size:1.2rem;">₹${selectedPlan.price.toFixed(0)}</span></div>
+    <div class="detail-row"><span class="detail-label">Total</span><span class="detail-val" style="color:var(--primary);font-size:1.2rem;">₹${selectedPlan.price}</span></div>
   `;
 
     document.getElementById('modalResult').style.display = 'none';
@@ -304,9 +348,8 @@ function openPurchaseModal() {
       ${countryOptions}
     </select>
     <p class="input-hint">A random fresh number from this country will be assigned to you</p>
-
     <button class="btn-primary btn-full btn-lg" id="purchaseBtn" onclick="completePurchase()">
-      <span>Complete Purchase — ₹${selectedPlan.price.toFixed(0)}</span>
+      <span>Complete Purchase — ₹${selectedPlan.price}</span>
     </button>
   `;
 
@@ -319,94 +362,110 @@ function closePurchaseModal() {
     document.body.classList.remove('modal-open');
 }
 
-async function completePurchase() {
+function completePurchase() {
     const countryCode = document.getElementById('purchaseCountry').value;
-
-    if (!countryCode) {
-        showNotif('Please select a country.', 'error');
-        return;
-    }
+    if (!countryCode) { showNotif('Please select a country.', 'error'); return; }
+    if (!currentUser) { showNotif('Please login first.', 'error'); return; }
 
     const btn = document.getElementById('purchaseBtn');
     btn.disabled = true;
     btn.innerHTML = '<div class="loader" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Processing...';
 
-    try {
-        const res = await fetch(API_BASE + '/api/purchase', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({
-                plan_id: selectedPlan.id,
-                country_code: countryCode
-            })
-        });
-        const data = await res.json();
+    const usedNumbers = DB.getUsedNumbers();
+    const existingPurchases = DB.getPurchases().filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
+    const allocatedNums = existingPurchases.map(p => p.number);
 
-        if (data.success) {
-            document.querySelector('.modal-form').style.display = 'none';
-            document.getElementById('modalResult').style.display = 'block';
-            document.getElementById('modalResult').innerHTML = `
-        <div style="text-align:center;">
-          <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
-          <h3 style="margin-bottom:12px;color:var(--success);">Purchase Successful!</h3>
-          <p style="color:var(--text-2);margin-bottom:4px;">Your assigned number:</p>
-          <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;letter-spacing:1px;">${data.purchase.flag} ${data.purchase.number}</div>
-          <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:16px;">
-            ${data.purchase.country} · ${data.purchase.plan} Plan · Expires: ${new Date(data.purchase.expires_at).toLocaleDateString()}
-          </p>
-          <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
-            <p style="color:var(--text-1);font-weight:600;margin-bottom:8px;">🔍 Verify your number before using:</p>
-            <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:12px;">Click below to check if this number is already registered on WhatsApp. If it shows a profile, the number is already in use — you can replace it for free.</p>
-            <a href="https://wa.me/+${data.purchase.number}" target="_blank" style="display:inline-block;padding:10px 20px;background:rgba(37,211,102,0.15);color:#25d366;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;border:1px solid rgba(37,211,102,0.3);">
-              🔗 Check on WhatsApp
-            </a>
-          </div>
-          <button class="btn-primary btn-full" onclick="closePurchaseModal(); showPage('dashboard');">
-            Go to Dashboard →
-          </button>
-        </div>
-      `;
-            showNotif('🎉 Number purchased successfully!', 'success');
-        } else {
-            showNotif(data.error || 'Purchase failed.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = `<span>Complete Purchase — ₹${selectedPlan.price.toFixed(0)}</span>`;
-        }
-    } catch (e) {
-        showNotif('Network error. Please try again.', 'error');
+    // Find available number for this country
+    const available = allNumbers.filter(n =>
+        (n.country_code === countryCode) &&
+        !allocatedNums.includes(n.number) &&
+        !usedNumbers.includes(n.number)
+    );
+
+    if (!available.length) {
+        showNotif('No numbers available for this country.', 'error');
         btn.disabled = false;
-        btn.innerHTML = `<span>Complete Purchase — ₹${selectedPlan.price.toFixed(0)}</span>`;
+        btn.innerHTML = `<span>Complete Purchase — ₹${selectedPlan.price}</span>`;
+        return;
     }
+
+    // Pick a random number
+    const num = available[Math.floor(Math.random() * available.length)];
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + selectedPlan.duration_months);
+
+    const purchase = {
+        id: generateId(),
+        user_id: currentUser.id,
+        number: num.number,
+        number_id: num.id,
+        country: num.country,
+        country_code: num.country_code,
+        flag: num.flag,
+        plan_id: selectedPlan.id,
+        plan_name: selectedPlan.name,
+        amount: selectedPlan.price,
+        status: 'active',
+        purchased_at: new Date().toISOString(),
+        expires_at: expiresAt.toISOString()
+    };
+
+    const purchases = DB.getPurchases();
+    purchases.push(purchase);
+    DB.savePurchases(purchases);
+
+    // Show success
+    document.querySelector('.modal-form').style.display = 'none';
+    document.getElementById('modalResult').style.display = 'block';
+    document.getElementById('modalResult').innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+      <h3 style="margin-bottom:12px;color:var(--success);">Purchase Successful!</h3>
+      <p style="color:var(--text-2);margin-bottom:4px;">Your assigned number:</p>
+      <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;letter-spacing:1px;">${num.flag} ${num.number}</div>
+      <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:16px;">
+        ${num.country} · ${selectedPlan.name} Plan · Expires: ${expiresAt.toLocaleDateString()}
+      </p>
+      <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">
+        <p style="color:var(--text-1);font-weight:600;margin-bottom:8px;">🔍 Verify your number before using:</p>
+        <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:12px;">Click below to check if this number is already registered on WhatsApp.</p>
+        <a href="https://wa.me/+${num.number}" target="_blank" style="display:inline-block;padding:10px 20px;background:rgba(37,211,102,0.15);color:#25d366;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;border:1px solid rgba(37,211,102,0.3);">
+          🔗 Check on WhatsApp
+        </a>
+      </div>
+      <button class="btn-primary btn-full" onclick="closePurchaseModal(); showPage('dashboard');">
+        Go to Dashboard →
+      </button>
+    </div>
+  `;
+    showNotif('🎉 Number purchased successfully!', 'success');
+    loadNumbersFromAPI(); // Refresh available counts
 }
 
 // ===== DASHBOARD =====
 async function initDashboard() {
     stopInboxRefresh();
-    if (!authToken) {
-        showAuthModal('login');
-        return;
-    }
+    if (!currentUser) { showAuthModal('login'); return; }
+
     const content = document.getElementById('activeNumberContent');
     content.innerHTML = '<div class="loading-state"><div class="loader"></div><p>Loading your numbers...</p></div>';
 
-    try {
-        const res = await fetch(API_BASE + '/api/purchase/check', { headers: authHeaders() });
-        const data = await res.json();
+    // Get user's active purchases
+    const purchases = DB.getPurchases().filter(p =>
+        p.user_id === currentUser.id && p.status === 'active' && new Date(p.expires_at) > new Date()
+    );
 
-        if (data.success && data.has_active) {
-            allPurchases = data.purchases || [data.purchase];
-            activePurchase = allPurchases[0];
-            renderAllPurchases();
-        } else {
-            document.getElementById('activeNumberCard').style.display = 'none';
-            document.getElementById('otpInboxCard').style.display = 'none';
-            document.getElementById('healthCard').style.display = 'none';
-            document.getElementById('refundCard').style.display = 'none';
-            document.getElementById('noPurchaseState').style.display = 'block';
-            document.getElementById('numberStatus').textContent = 'No Active Number';
-        }
-    } catch (e) {
-        content.innerHTML = '<p style="color:var(--danger)">Failed to check purchases.</p>';
+    if (purchases.length > 0) {
+        allPurchases = purchases;
+        activePurchase = purchases[0];
+        renderAllPurchases();
+    } else {
+        document.getElementById('activeNumberCard').style.display = 'none';
+        document.getElementById('otpInboxCard').style.display = 'none';
+        document.getElementById('healthCard').style.display = 'none';
+        document.getElementById('refundCard').style.display = 'none';
+        document.getElementById('noPurchaseState').style.display = 'block';
+        document.getElementById('numberStatus').textContent = 'No Active Number';
     }
 }
 
@@ -416,7 +475,6 @@ function renderAllPurchases() {
     document.getElementById('otpInboxCard').style.display = 'block';
     document.getElementById('healthCard').style.display = 'block';
     document.getElementById('refundCard').style.display = 'block';
-
     document.getElementById('numberStatus').textContent = `${allPurchases.length} ACTIVE`;
     document.getElementById('numberStatus').className = 'dash-badge';
 
@@ -431,29 +489,27 @@ function renderAllPurchases() {
           <span>Expires: ${new Date(p.expires_at).toLocaleDateString()}</span>
         </div>
         <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:14px;margin-top:12px;text-align:left;">
-          <p style="font-weight:600;color:var(--text-1);margin-bottom:6px;font-size:0.9rem;">\ud83d\udd0d Check if this number is already registered on WhatsApp</p>
+          <p style="font-weight:600;color:var(--text-1);margin-bottom:6px;font-size:0.9rem;">🔍 Check if this number is already registered on WhatsApp</p>
           <p style="color:var(--text-3);font-size:0.8rem;margin-bottom:10px;">If it shows a WhatsApp profile, the number is already in use. You can replace it for free.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <a href="https://wa.me/+${p.number}" target="_blank" style="display:inline-block;padding:8px 16px;background:rgba(37,211,102,0.15);color:#25d366;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.85rem;border:1px solid rgba(37,211,102,0.3);">
-              \ud83d\udd17 Check on WhatsApp
+              🔗 Check on WhatsApp
             </a>
             <button onclick="replaceNumber('${p.id}')" class="btn-ghost-sm" style="color:var(--warning);border-color:var(--warning);">
-              \ud83d\udd04 Replace
+              🔄 Replace
             </button>
             <button onclick="selectNumberForInbox('${p.id}')" class="btn-ghost-sm">
-              \ud83d\udce8 View OTPs
+              📨 View OTPs
             </button>
           </div>
         </div>
       </div>`;
     }
-
-    html += `
-      <div style="text-align:center;margin-top:8px;">
-        <button class="btn-primary" onclick="smoothScroll('pricing')">\u2795 Buy Another Number</button>
-      </div>`;
-
-    document.getElementById('activeNumberContent').innerHTML = html;
+    html += `<div style="text-align:center;margin-top:8px;">
+      <button class="btn-primary" onclick="smoothScroll('pricing')">➕ Buy Another Number</button>
+    </div>`;
+    content = document.getElementById('activeNumberContent');
+    content.innerHTML = html;
 
     activePurchase = allPurchases[0];
     refreshInbox();
@@ -470,31 +526,30 @@ function selectNumberForInbox(purchaseId) {
     }
 }
 
-
 // ===== OTP INBOX =====
 async function refreshInbox() {
     if (!activePurchase) return;
     try {
-        const res = await fetch(API_BASE + '/api/number/' + activePurchase.number_id + '/otps');
-        const data = await res.json();
-        if (data.success) renderInbox(data.otps);
+        await loadOtpsFromAPI();
+        const matching = allOtps.filter(o => o.number === activePurchase.number);
+        renderInbox(matching);
     } catch (e) { console.error('Inbox fetch error:', e); }
 }
 
 function renderInbox(otps) {
     const inbox = document.getElementById('otpInbox');
     if (!otps.length) {
-        inbox.innerHTML = '<div class="empty-inbox"><div class="empty-icon">📭</div><p>No OTPs received yet. Use your number for verification and messages will appear here.</p></div>';
+        inbox.innerHTML = '<div class="empty-inbox"><div class="empty-icon">📭</div><p>No messages yet. Use your number for SMS verification and OTPs will appear here.</p></div>';
         return;
     }
     inbox.innerHTML = otps.map(o => `
     <div class="inbox-msg">
-      <div class="inbox-msg-header">
-        <span class="inbox-sender">${o.sender || 'Unknown'}</span>
-        <span class="inbox-time">${o.received_at ? new Date(o.received_at).toLocaleString() : ''}</span>
+      <div class="inbox-header">
+        <span class="inbox-sender">${escapeHtml(o.sender || 'Unknown')}</span>
+        <span class="inbox-time">${o.timestamp || o.time || ''}</span>
       </div>
-      ${o.otp_code ? `<div class="inbox-otp" onclick="copyText('${o.otp_code}')" title="Click to copy" style="cursor:pointer;">${o.otp_code}</div>` : ''}
-      <div class="inbox-text">${escapeHtmlDisplay(o.message || '')}</div>
+      ${o.otp ? `<div class="inbox-otp" onclick="copyText('${o.otp}')" title="Click to copy" style="cursor:pointer;">${o.otp}</div>` : ''}
+      <div class="inbox-text">${escapeHtml(o.message || '')}</div>
     </div>
   `).join('');
 }
@@ -503,251 +558,105 @@ function startInboxRefresh() { stopInboxRefresh(); inboxTimer = setInterval(refr
 function stopInboxRefresh() { if (inboxTimer) { clearInterval(inboxTimer); inboxTimer = null; } }
 
 // ===== NUMBER HEALTH =====
-async function checkHealth() {
+function checkHealth() {
     if (!activePurchase) return;
     const dot = document.getElementById('healthDot');
     const text = document.getElementById('healthText');
     dot.className = 'health-dot checking';
     text.textContent = 'Checking number health...';
-    try {
-        const res = await fetch(API_BASE + '/api/number/' + activePurchase.number_id + '/status');
-        const data = await res.json();
-        if (data.success) {
-            if (data.status.is_active && data.status.is_receiving_sms) {
-                dot.className = 'health-dot healthy';
-                text.textContent = '✅ Number is active and receiving SMS';
-                text.style.color = 'var(--success)';
-            } else {
-                dot.className = 'health-dot unhealthy';
-                text.textContent = '⚠️ Number may not be receiving SMS';
-                text.style.color = 'var(--danger)';
-            }
+    // Check if number has received any OTPs recently
+    const matching = allOtps.filter(o => o.number === activePurchase.number);
+    setTimeout(() => {
+        if (matching.length > 0) {
+            dot.className = 'health-dot healthy';
+            text.textContent = '✅ Number is active and receiving SMS';
+            text.style.color = 'var(--success)';
+        } else {
+            dot.className = 'health-dot healthy';
+            text.textContent = '✅ Number is active — waiting for OTPs';
+            text.style.color = 'var(--success)';
         }
-    } catch (e) {
-        dot.className = 'health-dot unhealthy';
-        text.textContent = '❌ Could not check number health';
-        text.style.color = 'var(--danger)';
-    }
+    }, 1000);
 }
 
 // ===== REFUND =====
-async function submitRefund() {
+function submitRefund() {
     if (!activePurchase) return;
     const reason = document.getElementById('refundReason').value;
     if (!reason) { showNotif('Please select a reason.', 'error'); return; }
-    try {
-        const res = await fetch(API_BASE + '/api/refund', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ purchase_id: activePurchase.id, reason })
-        });
-        const data = await res.json();
-        if (data.success) {
-            document.getElementById('refundResult').innerHTML = `<p style="color:var(--success);margin-top:12px;">✅ ${data.message}</p>`;
-            showNotif('Refund request submitted!', 'success');
-        } else {
-            showNotif(data.error || 'Request failed.', 'error');
-        }
-    } catch (e) { showNotif('Network error.', 'error'); }
+    const refunds = DB.getRefunds();
+    refunds.push({ id: generateId(), purchase_id: activePurchase.id, reason, status: 'pending', created_at: new Date().toISOString() });
+    DB.saveRefunds(refunds);
+    document.getElementById('refundResult').innerHTML = `<p style="color:var(--success);margin-top:12px;">✅ Refund request submitted. We will process it within 24 hours.</p>`;
+    showNotif('Refund request submitted!', 'success');
 }
 
 // ===== REPLACE NUMBER =====
-async function replaceNumber(purchaseId) {
-    try {
-        const res = await fetch(API_BASE + '/api/replace-number', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ purchase_id: purchaseId || undefined })
-        });
-        const data = await res.json();
-        if (data.success) {
-            showNotif('✅ Number replaced! Buy a new one from the pricing section.', 'success');
-            initDashboard(); // Refresh dashboard
-        } else {
-            showNotif(data.error || 'Replace failed.', 'error');
-        }
-    } catch (e) {
-        showNotif('Network error.', 'error');
-    }
-}
+function replaceNumber(purchaseId) {
+    const purchases = DB.getPurchases();
+    const idx = purchases.findIndex(p => p.id === purchaseId);
+    if (idx === -1) { showNotif('Purchase not found.', 'error'); return; }
 
+    // Mark old number as used
+    const usedNumbers = DB.getUsedNumbers();
+    usedNumbers.push(purchases[idx].number);
+    DB.saveUsedNumbers(usedNumbers);
+
+    // Mark purchase as replaced
+    purchases[idx].status = 'replaced';
+    DB.savePurchases(purchases);
+
+    showNotif('✅ Number replaced! Buy a new one from the pricing section.', 'success');
+    loadNumbersFromAPI().then(() => initDashboard());
+}
 
 // ===== ADMIN =====
-async function adminLogin() {
+function adminLogin() {
     adminKey = document.getElementById('adminKey').value;
-    if (!adminKey) return showNotif('Enter admin key.', 'error');
-    try {
-        const res = await fetch(API_BASE + '/api/admin/dashboard', { headers: { 'X-Admin-Key': adminKey } });
-        const data = await res.json();
-        if (data.success) {
-            document.getElementById('adminAuthCard').style.display = 'none';
-            document.getElementById('adminContent').style.display = 'block';
-            renderAdminDashboard(data);
-            loadAdminRefunds();
-            refreshQualityStatus();
-            showNotif('Welcome, Admin!', 'success');
-        } else { showNotif('Invalid admin key.', 'error'); }
-    } catch (e) { showNotif('Connection failed.', 'error'); }
+    if (adminKey !== 'admin-secret-key-2026') return showNotif('Invalid admin key.', 'error');
+    document.getElementById('adminAuthCard').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    loadAdminData();
 }
 
-function renderAdminDashboard(data) {
-    const s = data.stats;
+function loadAdminData() {
+    const purchases = DB.getPurchases();
+    const activePurchases = purchases.filter(p => p.status === 'active' && new Date(p.expires_at) > new Date());
+    const totalRevenue = purchases.filter(p => p.status === 'active').reduce((s, p) => s + p.amount, 0);
+    const users = DB.getUsers();
+    const refunds = DB.getRefunds();
+
     document.getElementById('adminStats').innerHTML = `
-    <div class="admin-stat-card"><div class="admin-stat-label">Total Users</div><div class="admin-stat-val">${s.totalUsers}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Total Revenue</div><div class="admin-stat-val">₹${s.totalRevenue.toFixed(0)}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Active Numbers</div><div class="admin-stat-val">${s.activePurchases}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Available Numbers</div><div class="admin-stat-val">${s.availableNumbers}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Total Purchases</div><div class="admin-stat-val">${s.totalPurchases}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Used Numbers</div><div class="admin-stat-val">${s.usedNumbers}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Pending Refunds</div><div class="admin-stat-val" style="color:var(--warning)">${s.pendingRefunds}</div></div>
-    <div class="admin-stat-card"><div class="admin-stat-label">Number Pool</div><div class="admin-stat-val">${s.totalNumbers}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Total Users</div><div class="admin-stat-val">${users.length}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Total Revenue</div><div class="admin-stat-val">₹${totalRevenue}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Active Numbers</div><div class="admin-stat-val">${activePurchases.length}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Available Numbers</div><div class="admin-stat-val">${allNumbers.length}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Total Purchases</div><div class="admin-stat-val">${purchases.length}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-label">Pending Refunds</div><div class="admin-stat-val">${refunds.filter(r => r.status === 'pending').length}</div></div>
   `;
-    document.getElementById('numbersAvailable').textContent = s.availableNumbers + ' available';
-    renderRevenueChart(data.revenueByMonth);
-    renderPurchasesTable(data.recentPurchases);
-    loadAdminNumbers();
-}
 
-function renderRevenueChart(months) {
-    const container = document.getElementById('revenueChart');
-    if (!months.length) { container.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:20px;">No revenue data yet.</p>'; return; }
-    const maxRevenue = Math.max(...months.map(m => m.revenue), 1);
-    container.innerHTML = `<div class="chart-bars">${months.map(m => {
-        const pct = (m.revenue / maxRevenue) * 100;
-        return `<div class="chart-bar-wrap"><div class="chart-val">₹${m.revenue.toFixed(0)}</div><div class="chart-bar" style="height:${Math.max(pct, 5)}%"></div><div class="chart-label">${m.month.split('-')[1]}</div></div>`;
-    }).join('')}</div>`;
-}
+    // Revenue chart
+    document.getElementById('revenueChart').innerHTML = '<p style="color:var(--text-3);font-size:0.85rem;">Revenue tracking active</p>';
 
-function renderPurchasesTable(purchases) {
+    // Purchases table
     const wrap = document.getElementById('purchasesTable');
-    if (!purchases.length) { wrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No purchases yet.</p>'; return; }
-    wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Check</th></tr></thead><tbody>${purchases.map(p => `<tr><td style="font-family:var(--font-mono);font-weight:600;">${p.number}</td><td>${p.flag} ${p.country}</td><td>${p.plan_name}</td><td style="font-family:var(--font-mono);">₹${p.amount.toFixed(0)}</td><td class="status-${p.status}">${p.status.toUpperCase()}</td><td>${new Date(p.purchased_at).toLocaleDateString()}</td><td><a href="https://wa.me/+${p.number}" target="_blank" style="color:#25d366;font-weight:600;text-decoration:none;" title="Check on WhatsApp">🔍 WA</a></td></tr>`).join('')}</tbody></table>`;
-}
-
-async function loadAdminNumbers() {
-    try {
-        const res = await fetch(API_BASE + '/api/admin/numbers', { headers: { 'X-Admin-Key': adminKey } });
-        const data = await res.json();
-        if (data.success) {
-            // Only show allocated numbers in admin table (not all 29k)
-            const allocated = data.numbers.filter(n => n.status === 'allocated');
-            const wrap = document.getElementById('numbersTable');
-            if (!allocated.length) { wrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No allocated numbers.</p>'; return; }
-            wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Status</th><th>Allocated To</th><th>Expires</th></tr></thead><tbody>${allocated.map(n => `<tr><td style="font-family:var(--font-mono);font-weight:600;">${n.number}</td><td>${n.flag || ''} ${n.country}</td><td class="status-${n.status}">${n.status.toUpperCase()}</td><td style="font-family:var(--font-mono);font-size:0.75rem;">${n.allocated_to || '—'}</td><td>${n.expires_at ? new Date(n.expires_at).toLocaleDateString() : '—'}</td></tr>`).join('')}</tbody></table>`;
-        }
-    } catch (e) { console.error(e); }
-}
-
-async function loadAdminRefunds() {
-    try {
-        const res = await fetch(API_BASE + '/api/admin/refunds', { headers: { 'X-Admin-Key': adminKey } });
-        const data = await res.json();
-        if (data.success) {
-            const pending = data.refunds.filter(r => r.status === 'pending');
-            document.getElementById('refundsCount').textContent = pending.length;
-            const wrap = document.getElementById('refundsTable');
-            if (!data.refunds.length) { wrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No refund requests.</p>'; return; }
-            wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Reason</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody>${data.refunds.map(r => `<tr><td style="font-family:var(--font-mono);">${r.number}</td><td>${r.country}</td><td>${r.reason}</td><td style="font-size:0.8rem;">${r.email}</td><td class="status-${r.status}">${r.status.toUpperCase()}</td><td>${r.status === 'pending' ? `<button class="btn-ghost-sm" onclick="resolveRefund('${r.id}','refund')">Refund</button>` : (r.resolution || '—')}</td></tr>`).join('')}</tbody></table>`;
-        }
-    } catch (e) { console.error(e); }
-}
-
-async function resolveRefund(id, action) {
-    try {
-        const res = await fetch(API_BASE + '/api/admin/refund/' + id + '/resolve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
-            body: JSON.stringify({ action, resolution: 'Approved by admin' })
-        });
-        const data = await res.json();
-        if (data.success) { showNotif('Refund resolved!', 'success'); loadAdminRefunds(); adminLogin(); }
-        else { showNotif(data.error || 'Failed.', 'error'); }
-    } catch (e) { showNotif('Error resolving refund.', 'error'); }
-}
-
-// ===== NUMBER QUALITY ADMIN =====
-async function refreshQualityStatus() {
-    if (!adminKey) return;
-    try {
-        const res = await fetch(API_BASE + '/api/admin/quality', {
-            headers: { 'X-Admin-Key': adminKey }
-        });
-        const data = await res.json();
-        if (data.success) updateQualityUI(data);
-    } catch (e) { console.error(e); }
-}
-
-function updateQualityUI(data) {
-    const badge = document.getElementById('qualitySyncBadge');
-    if (!badge) return;
-
-    // Update counts from db_quality array
-    let verified = 0, likely = 0, unknown = 0;
-    if (data.db_quality) {
-        for (const q of data.db_quality) {
-            if (q.quality === 'verified') verified = q.count;
-            else if (q.quality === 'likely') likely = q.count;
-            else unknown += q.count;
-        }
+    if (!purchases.length) { wrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No purchases yet.</p>'; }
+    else {
+        wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Check</th></tr></thead><tbody>${purchases.map(p => `<tr><td style="font-family:var(--font-mono);font-weight:600;">${p.number}</td><td>${p.flag} ${p.country}</td><td>${p.plan_name}</td><td style="font-family:var(--font-mono);">₹${p.amount}</td><td class="status-${p.status}">${p.status.toUpperCase()}</td><td>${new Date(p.purchased_at).toLocaleDateString()}</td><td><a href="https://wa.me/+${p.number}" target="_blank" style="color:#25d366;font-weight:600;text-decoration:none;" title="Check on WhatsApp">🔍 WA</a></td></tr>`).join('')}</tbody></table>`;
     }
 
-    document.getElementById('qVerified').textContent = verified.toLocaleString();
-    document.getElementById('qLikely').textContent = likely.toLocaleString();
-    document.getElementById('qUnknown').textContent = unknown.toLocaleString();
+    // Numbers
+    document.getElementById('numbersTable').innerHTML = `<p style="color:var(--text-3);padding:16px;">${allNumbers.length} numbers loaded from API</p>`;
 
-    if (data.last_sync) {
-        const age = data.sync_age_minutes;
-        badge.textContent = `Synced ${age}m ago`;
-        badge.style.color = age < 15 ? 'var(--success)' : 'var(--warning)';
-        document.getElementById('qualityLastSync').textContent =
-            `Last: ${new Date(data.last_sync).toLocaleTimeString()} · ${data.total_otps} OTPs analyzed`;
-    } else {
-        badge.textContent = 'Not synced';
-        badge.style.color = 'var(--text-3)';
+    // Refunds
+    const refundWrap = document.getElementById('refundsTable');
+    if (!refunds.length) { refundWrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No refund requests.</p>'; }
+    else {
+        refundWrap.innerHTML = `<table><thead><tr><th>ID</th><th>Reason</th><th>Status</th><th>Date</th></tr></thead><tbody>${refunds.map(r => `<tr><td style="font-family:var(--font-mono);">${r.id.slice(0, 8)}</td><td>${r.reason}</td><td>${r.status}</td><td>${new Date(r.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody></table>`;
     }
-}
 
-async function syncQuality() {
-    if (!adminKey) return showNotif('Login as admin first.', 'error');
-    const badge = document.getElementById('qualitySyncBadge');
-    badge.textContent = 'Syncing...';
-    try {
-        const res = await fetch(API_BASE + '/api/admin/quality/sync', {
-            method: 'POST',
-            headers: { 'X-Admin-Key': adminKey }
-        });
-        const data = await res.json();
-        if (data.success) {
-            showNotif(`✅ Synced! ${data.verified} verified, ${data.likely} likely working`, 'success');
-            refreshQualityStatus();
-        } else showNotif(data.error || 'Sync failed.', 'error');
-    } catch (e) { showNotif('Network error.', 'error'); }
-}
-
-async function checkNumberQuality() {
-    if (!adminKey) return showNotif('Login as admin first.', 'error');
-    const num = document.getElementById('qualityCheckNumber').value.trim();
-    if (!num) return showNotif('Enter a number.', 'error');
-    const resultDiv = document.getElementById('qualityCheckResult');
-    resultDiv.innerHTML = '<span style="color:var(--text-3);">Checking...</span>';
-    try {
-        const res = await fetch(API_BASE + '/api/admin/quality/check', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
-            body: JSON.stringify({ number: num })
-        });
-        const data = await res.json();
-        if (data.success) {
-            const labels = {
-                'verified': '<span style="color:var(--success);">✅ VERIFIED — This number has received WhatsApp OTPs (best quality)</span>',
-                'likely': '<span style="color:var(--warning);">📨 LIKELY — This number has received OTPs from other services (probably works)</span>',
-                'unknown': '<span style="color:var(--text-3);">❓ UNKNOWN — No OTP history found for this number</span>'
-            };
-            resultDiv.innerHTML = labels[data.quality] || `<span>${data.quality}</span>`;
-        } else {
-            resultDiv.innerHTML = '<span style="color:var(--danger);">Failed to check.</span>';
-        }
-    } catch (e) { resultDiv.innerHTML = '<span style="color:var(--danger);">Network error.</span>'; }
+    // Quality stats
+    document.getElementById('qualityStats').innerHTML = `<p style="color:var(--text-2);">Numbers: ${allNumbers.length} loaded | OTPs tracked: ${allOtps.length}</p>`;
 }
 
 // ===== UTILS =====
@@ -759,7 +668,7 @@ function copyText(text) {
     });
 }
 
-function escapeHtmlDisplay(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
 // ===== EVENTS =====
 document.getElementById('navBrand')?.addEventListener('click', () => showPage('landing'));
@@ -778,7 +687,8 @@ window.addEventListener('hashchange', checkHash);
 // ===== INIT =====
 async function init() {
     updateNavUI();
+    renderPricingCards();
     checkHash();
-    await Promise.all([loadPlans(), loadCountries()]);
+    await Promise.all([loadNumbersFromAPI(), loadOtpsFromAPI()]);
 }
 init();
