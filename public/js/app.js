@@ -392,8 +392,8 @@ function completePurchase() {
     }
 
     // Define UPI and WhatsApp details (Change these to your real ones later)
-    const upiID = 'otpbot@ybl'; // Replace with real UPI ID
-    const waNumber = '919000000000'; // Replace with actual WhatsApp number
+    const upiID = 'otpbotcom@jio'; // Replace with real UPI ID
+    const waNumber = '584164444103'; // Replace with actual WhatsApp number
     const amount = selectedPlan.price;
 
     // Generate Direct UPI Deep Link
