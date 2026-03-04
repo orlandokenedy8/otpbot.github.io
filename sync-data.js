@@ -35,8 +35,8 @@ function fetchJSON(endpoint, outputFile) {
 
                             countryStats[key].count++; // Track the true available number
 
-                            // Only keep the first 5 numbers per country
-                            if (countryStats[key].items.length < 5) {
+                            // Only keep the first 1 number per country
+                            if (countryStats[key].items.length < 1) {
                                 countryStats[key].items.push(n);
                             }
                         });
