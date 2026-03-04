@@ -422,7 +422,7 @@ function completePurchase() {
       <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
       <h3 style="margin-bottom:12px;color:var(--success);">Purchase Successful!</h3>
       <p style="color:var(--text-2);margin-bottom:4px;">Your assigned number:</p>
-      <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;letter-spacing:1px;">${num.flag} ${num.number}</div>
+      <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;letter-spacing:1px;">${num.flag} +${num.number}</div>
       <p style="color:var(--text-3);font-size:0.85rem;margin-bottom:16px;">
         ${num.country} · ${selectedPlan.name} Plan · Expires: ${expiresAt.toLocaleDateString()}
       </p>
@@ -482,7 +482,7 @@ function renderAllPurchases() {
     for (const p of allPurchases) {
         html += `
       <div class="dash-number-display" style="margin-bottom:16px;">
-        <div class="dnd-val">${p.number}</div>
+        <div class="dnd-val">+${p.number}</div>
         <div class="dnd-meta">
           <span>${p.flag} ${p.country}</span>
           <span>Plan: ${p.plan_name}</span>
@@ -522,7 +522,7 @@ function selectNumberForInbox(purchaseId) {
     if (p) {
         activePurchase = p;
         refreshInbox();
-        showNotif(`Showing OTPs for ${p.number}`, 'success');
+        showNotif(`Showing OTPs for +${p.number}`, 'success');
     }
 }
 
@@ -642,7 +642,7 @@ function loadAdminData() {
     const wrap = document.getElementById('purchasesTable');
     if (!purchases.length) { wrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No purchases yet.</p>'; }
     else {
-        wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Check</th></tr></thead><tbody>${purchases.map(p => `<tr><td style="font-family:var(--font-mono);font-weight:600;">${p.number}</td><td>${p.flag} ${p.country}</td><td>${p.plan_name}</td><td style="font-family:var(--font-mono);">₹${p.amount}</td><td class="status-${p.status}">${p.status.toUpperCase()}</td><td>${new Date(p.purchased_at).toLocaleDateString()}</td><td><a href="https://wa.me/+${p.number}" target="_blank" style="color:#25d366;font-weight:600;text-decoration:none;" title="Check on WhatsApp">🔍 WA</a></td></tr>`).join('')}</tbody></table>`;
+        wrap.innerHTML = `<table><thead><tr><th>Number</th><th>Country</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Check</th></tr></thead><tbody>${purchases.map(p => `<tr><td style="font-family:var(--font-mono);font-weight:600;">+${p.number}</td><td>${p.flag} ${p.country}</td><td>${p.plan_name}</td><td style="font-family:var(--font-mono);">₹${p.amount}</td><td class="status-${p.status}">${p.status.toUpperCase()}</td><td>${new Date(p.purchased_at).toLocaleDateString()}</td><td><a href="https://wa.me/+${p.number}" target="_blank" style="color:#25d366;font-weight:600;text-decoration:none;" title="Check on WhatsApp">🔍 WA</a></td></tr>`).join('')}</tbody></table>`;
     }
 
     // Numbers
