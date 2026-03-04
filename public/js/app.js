@@ -5,7 +5,6 @@
 
 // Encoded config (not plaintext)
 const _d = s => atob(s).split('').map(c => String.fromCharCode(c.charCodeAt(0) - 3)).join('');
-const KOYEB_API = _d('a3d3c3Y9MjJ6aGRuMGdob3J1bHYwcXJ3a2xxajk6NTc2NzBpaDs4NDo8ZzFucnxoZTFkc3M=');
 
 // ===== STATIC PLANS (no backend needed) =====
 const PLANS = [
@@ -239,10 +238,10 @@ function showNotif(msg, type = 'default') {
 // ===== FAQ =====
 function toggleFaq(el) { el.classList.toggle('open'); }
 
-// ===== LOAD DATA FROM KOYEB =====
+// ===== LOAD DATA STATICALLY (VIA ACTIONS SYNC) =====
 async function loadNumbersFromAPI() {
     try {
-        const res = await fetch(KOYEB_API + '/api/numbers');
+        const res = await fetch('data/numbers.json');
         const data = await res.json();
         if (data.success && data.numbers) {
             allNumbers = data.numbers;
@@ -270,7 +269,7 @@ async function loadNumbersFromAPI() {
 
 async function loadOtpsFromAPI() {
     try {
-        const res = await fetch(KOYEB_API + '/api/otps?limit=200');
+        const res = await fetch('data/otps.json');
         const data = await res.json();
         if (data.success && data.otps) allOtps = data.otps;
     } catch (e) {
