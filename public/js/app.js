@@ -252,9 +252,9 @@ async function loadNumbersFromAPI() {
 
             allNumbers.forEach(n => {
                 if (!allocatedNumbers.includes(n.number) && !usedNumbers.includes(n.number)) {
-                    const key = n.country_code || n.country;
+                    const key = n.countryCode || n.country;
                     if (!countryMap[key]) {
-                        countryMap[key] = { country: n.country, country_code: n.country_code, flag: n.flag, available: 0 };
+                        countryMap[key] = { country: n.country, countryCode: n.countryCode, flag: n.flag, available: 0 };
                     }
                     countryMap[key].available++;
                 }
@@ -327,7 +327,7 @@ function openPurchaseModal() {
     }
 
     let countryOptions = countries.map(c =>
-        `<option value="${c.country_code}">${c.flag} ${c.country} (${c.available} available)</option>`
+        `<option value="${c.countryCode}">${c.flag} ${c.country} (${c.available} available)</option>`
     ).join('');
     if (!countryOptions) countryOptions = '<option value="">No numbers available</option>';
 
@@ -377,7 +377,7 @@ function completePurchase() {
 
     // Find available number for this country
     const available = allNumbers.filter(n =>
-        (n.country_code === countryCode) &&
+        (n.countryCode === countryCode) &&
         !allocatedNums.includes(n.number) &&
         !usedNumbers.includes(n.number)
     );
@@ -400,7 +400,7 @@ function completePurchase() {
         number: num.number,
         number_id: num.id,
         country: num.country,
-        country_code: num.country_code,
+        countryCode: num.countryCode,
         flag: num.flag,
         plan_id: selectedPlan.id,
         plan_name: selectedPlan.name,
