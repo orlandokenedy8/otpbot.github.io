@@ -654,11 +654,44 @@ function loadAdminData() {
     const refundWrap = document.getElementById('refundsTable');
     if (!refunds.length) { refundWrap.innerHTML = '<p style="color:var(--text-3);padding:16px;">No refund requests.</p>'; }
     else {
-        refundWrap.innerHTML = `<table><thead><tr><th>ID</th><th>Reason</th><th>Status</th><th>Date</th></tr></thead><tbody>${refunds.map(r => `<tr><td style="font-family:var(--font-mono);">${r.id.slice(0, 8)}</td><td>${r.reason}</td><td>${r.status}</td><td>${new Date(r.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody></table>`;
+        refundWrap.innerHTML = `<table><thead><tr><th>ID</th><th>Reason</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>${refunds.map(r => `<tr><td style="font-family:var(--font-mono);">${r.id.slice(0, 8)}</td><td>${r.reason}</td><td class="status-${r.status}">${r.status.toUpperCase()}</td><td>${new Date(r.created_at).toLocaleDateString()}</td><td>${r.status === 'pending' ? `<button onclick="approveRefund('${r.id}')" style="background:var(--success);color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;margin-right:8px;font-weight:600;">✓ Approve</button><button onclick="rejectRefund('${r.id}')" style="background:var(--error);color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-weight:600;">✗ Reject</button>` : '—'}</td></tr>`).join('')}</tbody></table>`;
     }
 
     // Quality stats
     document.getElementById('qualityStats').innerHTML = `<p style="color:var(--text-2);">Numbers: ${allNumbers.length} loaded | OTPs tracked: ${allOtps.length}</p>`;
+}
+
+function approveRefund(id) {
+    if (!confirm('Approve this refund request?')) return;
+    const refunds = DB.getRefunds();
+    const r = refunds.find(x => x.id === id);
+    if (r) {
+        r.status = 'approved';
+        DB.saveRefunds(refunds);
+
+        // Mark purchase as refunded
+        const purchases = DB.getPurchases();
+        const p = purchases.find(x => x.id === r.purchase_id);
+        if (p) {
+            p.status = 'refunded';
+            DB.savePurchases(purchases);
+        }
+
+        loadAdminData();
+        showNotif('Refund approved. Status updated.', 'success');
+    }
+}
+
+function rejectRefund(id) {
+    if (!confirm('Reject this refund request?')) return;
+    const refunds = DB.getRefunds();
+    const r = refunds.find(x => x.id === id);
+    if (r) {
+        r.status = 'rejected';
+        DB.saveRefunds(refunds);
+        loadAdminData();
+        showNotif('Refund request rejected.', 'error');
+    }
 }
 
 // ===== UTILS =====
