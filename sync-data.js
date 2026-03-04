@@ -54,13 +54,35 @@ function fetchJSON(endpoint, outputFile) {
                         parsed.total = sampleNumbers.length;
                     }
 
-                    // IF fetching OTPs, restrict to only 1 OTP to prevent leaking the DB
+                    // IF fetching OTPs, separate them into individual files by number to protect privacy
                     if (endpoint.includes('/otps') && parsed.success && parsed.otps) {
-                        parsed.real_total = parsed.otps.length;
-                        if (parsed.otps.length > 1) {
-                            parsed.otps = parsed.otps.slice(0, 1);
+                        const otpsDir = path.join(DATA_DIR, 'otps');
+                        if (!fs.existsSync(otpsDir)) {
+                            fs.mkdirSync(otpsDir, { recursive: true });
+                        } else {
+                            const oldFiles = fs.readdirSync(otpsDir);
+                            for (const file of oldFiles) {
+                                fs.unlinkSync(path.join(otpsDir, file));
+                            }
                         }
-                        parsed.total = parsed.otps.length;
+
+                        const groups = {};
+                        for (const o of parsed.otps) {
+                            if (!groups[o.number]) groups[o.number] = [];
+                            groups[o.number].push(o);
+                        }
+
+                        for (const num in groups) {
+                            fs.writeFileSync(
+                                path.join(otpsDir, `${num}.json`),
+                                JSON.stringify({ success: true, otps: groups[num] })
+                            );
+                        }
+
+                        // Wipe the main file completely
+                        parsed.otps = [];
+                        parsed.total = 0;
+                        parsed.real_total = 0;
                     }
 
                     // Minify the JSON by parsing and stringifying it without spaces

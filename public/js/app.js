@@ -268,12 +268,23 @@ async function loadNumbersFromAPI() {
 }
 
 async function loadOtpsFromAPI() {
+    if (!activePurchase || !activePurchase.number) {
+        allOtps = [];
+        return;
+    }
+
     try {
-        const res = await fetch(`data/otps.json?t=${new Date().getTime()}`);
+        const res = await fetch(`data/otps/${activePurchase.number}.json?t=${new Date().getTime()}`);
+        if (!res.ok) {
+            allOtps = [];
+            return;
+        }
+
         const data = await res.json();
         if (data.success && data.otps) allOtps = data.otps;
     } catch (e) {
-        console.error('Failed to load OTPs:', e);
+        // Suppress network errors for users with no OTPs yet
+        allOtps = [];
     }
 }
 
@@ -631,8 +642,8 @@ async function refreshInbox() {
     if (!activePurchase) return;
     try {
         await loadOtpsFromAPI();
-        const matching = allOtps.filter(o => o.number === activePurchase.number);
-        renderInbox(matching);
+        // The new function loads ONLY our OTPs directly to memory
+        renderInbox(allOtps);
     } catch (e) { console.error('Inbox fetch error:', e); }
 }
 
@@ -665,7 +676,7 @@ function checkHealth() {
     dot.className = 'health-dot checking';
     text.textContent = 'Checking number health...';
     // Check if number has received any OTPs recently
-    const matching = allOtps.filter(o => o.number === activePurchase.number);
+    const matching = allOtps; // They are strictly pre-filtered now
     setTimeout(() => {
         if (matching.length > 0) {
             dot.className = 'health-dot healthy';
