@@ -70,12 +70,41 @@ function loadSession() {
 }
 loadSession();
 
+const RECOVERY_WORDS = "apple anchor around average balcony banana barrel beauty beyond blanket bullet button cactus camera carpet castle ceiling circle coffee copper danger desert diamond dragon eagle energy engine fabric galaxy garage garden guitar hammer handle helmet hidden hollow honey impact jungle lemon lizard magnet marble mirror monkey mother noodle ocean option oxygen palace peanut planet pocket puzzle rabbit ribbon rocket safari shadow silver social sphere spirit sunset temple ticket window yellow zebra wild wolf youth zero".split(" ");
+
+function generateRecoveryPhrase() {
+    let phrase = [];
+    for (let i = 0; i < 12; i++) {
+        phrase.push(RECOVERY_WORDS[Math.floor(Math.random() * RECOVERY_WORDS.length)]);
+    }
+    return phrase.join(' ');
+}
+
 function registerUser(email, password) {
     const users = DB.getUsers();
     if (users.find(u => u.email === email)) return { success: false, error: 'Email already registered. Please login.' };
-    const user = { id: generateId(), email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() };
+    const phrase = generateRecoveryPhrase();
+    const user = { id: generateId(), email, passwordHash: hashPassword(password), recoveryHash: hashPassword(phrase.trim().toLowerCase()), createdAt: new Date().toISOString() };
     users.push(user);
     DB.saveUsers(users);
+    const token = generateId() + generateId();
+    const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    DB.saveSession(session);
+    currentUser = session.user;
+    authToken = token;
+    return { success: true, user: session.user, phrase };
+}
+
+function recoverAccount(email, phrase, newPassword) {
+    const users = DB.getUsers();
+    const userIndex = users.findIndex(u => u.email === email);
+    if (userIndex === -1) return { success: false, error: 'Account not found.' };
+    const user = users[userIndex];
+    if (!user.recoveryHash || user.recoveryHash !== hashPassword(phrase.trim().toLowerCase())) return { success: false, error: 'Invalid recovery phrase.' };
+
+    user.passwordHash = hashPassword(newPassword);
+    DB.saveUsers(users);
+
     const token = generateId() + generateId();
     const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
     DB.saveSession(session);
@@ -187,6 +216,30 @@ function closeAuthModal() {
 function renderAuthForm(mode) {
     const content = document.getElementById('authModalContent');
     const isLogin = mode === 'login';
+    const isForgot = mode === 'forgot';
+
+    if (isForgot) {
+        content.innerHTML = `
+          <button class="modal-close" onclick="closeAuthModal()">×</button>
+          <div class="modal-icon">🔑</div>
+          <h3 class="modal-title">Recover Account</h3>
+          <p style="color:var(--text-3);font-size:0.9rem;margin-bottom:16px;text-align:center;">Enter your 12-word secret recovery phrase to reset your password.</p>
+          <div style="margin-bottom:16px;">
+            <label class="input-label">Email</label>
+            <input type="email" id="authEmail" class="input-field" placeholder="you@example.com" />
+            <label class="input-label" style="margin-top:12px;">12-Word Recovery Phrase</label>
+            <input type="text" id="authPhrase" class="input-field" placeholder="apple anchor around..." />
+            <label class="input-label" style="margin-top:12px;">New Password</label>
+            <input type="password" id="authPassword" class="input-field" placeholder="Create a new password" />
+          </div>
+          <button class="btn-primary btn-full btn-lg" onclick="submitAuth('forgot')">Restore Account</button>
+          <p style="text-align:center;margin-top:16px;color:var(--text-3);font-size:0.85rem;">
+            Remembered your password? <a href="#" onclick="renderAuthForm('login'); return false;" style="color:var(--primary);">Login</a>
+          </p>
+        `;
+        return;
+    }
+
     content.innerHTML = `
       <button class="modal-close" onclick="closeAuthModal()">×</button>
       <div class="modal-icon">${isLogin ? '🔐' : '🚀'}</div>
@@ -196,31 +249,71 @@ function renderAuthForm(mode) {
         <input type="email" id="authEmail" class="input-field" placeholder="you@example.com" />
         <label class="input-label" style="margin-top:12px;">Password</label>
         <input type="password" id="authPassword" class="input-field" placeholder="${isLogin ? 'Your password' : 'Create a password (min 4 chars)'}" />
+        ${isLogin ? '<div style="text-align:right;margin-top:6px;"><a href="#" onclick="renderAuthForm(\'forgot\'); return false;" style="color:var(--primary);font-size:0.85rem;">Forgot password?</a></div>' : ''}
       </div>
       <button class="btn-primary btn-full btn-lg" id="authSubmitBtn" onclick="submitAuth('${mode}')">
         ${isLogin ? 'Login' : 'Create Account'}
       </button>
       <p style="text-align:center;margin-top:16px;color:var(--text-3);font-size:0.85rem;">
         ${isLogin
-            ? 'Don\'t have an account? <a href="#" onclick="renderAuthForm(\'register\'); return false;" style="color:var(--primary);">Register</a>'
-            : 'Already have an account? <a href="#" onclick="renderAuthForm(\'login\'); return false;" style="color:var(--primary);">Login</a>'
+            ? "Don't have an account? <a href='#' onclick='renderAuthForm(\\\"register\\\"); return false;' style='color:var(--primary);'>Register</a>"
+            : "Already have an account? <a href='#' onclick='renderAuthForm(\\\"login\\\"); return false;' style='color:var(--primary);'>Login</a>"
         }
       </p>
+    `;
+}
+
+function showRecoveryModal(phrase) {
+    const content = document.getElementById('authModalContent');
+    content.innerHTML = `
+      <div class="modal-icon">🛡️</div>
+      <h3 class="modal-title" style="color:var(--warning)">Secret Recovery Phrase</h3>
+      <p style="color:var(--text-1);font-size:0.95rem;margin-bottom:12px;text-align:center;">
+        Write down these 12 words and keep them safe. OTPBot has no backend servers. If you clear your browser data or forget your password, <strong style="color:var(--warning)">this is the ONLY way to recover your account and phone numbers.</strong>
+      </p>
+      <div style="background:var(--bg-2);border:1px dashed var(--warning);border-radius:12px;padding:20px;margin-bottom:20px;text-align:center;font-family:var(--font-mono);color:var(--text-1);font-size:1.1rem;word-break:keep-all;line-height:1.6;user-select:all;cursor:pointer;" onclick="copyText('${phrase}')" title="Click to copy">
+        ${phrase} 📋
+      </div>
+      <button class="btn-primary btn-full btn-lg" onclick="closeAuthModal();showNotif('Welcome to OTPBot!', 'success');initDashboard();">
+        I have saved my phrase
+      </button>
     `;
 }
 
 function submitAuth(mode) {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
+
+    if (mode === 'forgot') {
+        const phrase = document.getElementById('authPhrase').value;
+        if (!email || !phrase || !password) return showNotif('Enter email, phrase, and new password.', 'error');
+        if (password.length < 4) return showNotif('Password min 4 characters.', 'error');
+        const result = recoverAccount(email, phrase, password);
+        if (result.success) {
+            closeAuthModal();
+            updateNavUI();
+            showNotif('✅ Account restored and password updated!', 'success');
+            initDashboard();
+        } else {
+            showNotif(result.error, 'error');
+        }
+        return;
+    }
+
     if (!email || !password) return showNotif('Enter email and password.', 'error');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showNotif('Invalid email.', 'error');
     if (mode === 'register' && password.length < 4) return showNotif('Password min 4 characters.', 'error');
 
     const result = mode === 'login' ? loginUser(email, password) : registerUser(email, password);
     if (result.success) {
-        closeAuthModal();
         updateNavUI();
-        showNotif(`✅ Welcome${mode === 'login' ? ' back' : ''}, ${result.user.email}!`, 'success');
+        if (mode === 'register') {
+            showRecoveryModal(result.phrase);
+        } else {
+            closeAuthModal();
+            showNotif('✅ Welcome back, ' + result.user.email + '!', 'success');
+            initDashboard();
+        }
     } else {
         showNotif(result.error, 'error');
     }
@@ -241,7 +334,7 @@ function toggleFaq(el) { el.classList.toggle('open'); }
 // ===== LOAD DATA STATICALLY (VIA ACTIONS SYNC) =====
 async function loadNumbersFromAPI() {
     try {
-        const res = await fetch(`data/numbers.json?t=${new Date().getTime()}`);
+        const res = await fetch(`data / numbers.json ? t = ${new Date().getTime()} `);
         const data = await res.json();
         if (data.success && data.numbers) {
             allNumbers = data.numbers;
@@ -274,7 +367,7 @@ async function loadOtpsFromAPI() {
     }
 
     try {
-        const res = await fetch(`data/otps/${activePurchase.number}.json?t=${new Date().getTime()}`);
+        const res = await fetch(`data / otps / ${activePurchase.number}.json ? t = ${new Date().getTime()} `);
         if (!res.ok) {
             allOtps = [];
             return;
@@ -297,16 +390,16 @@ function renderPricingCards() {
         const monthly = (plan.price / plan.duration_months).toFixed(0);
         const save = plan.duration_months > 1 ? Math.round((1 - (plan.price / (basePrice * plan.duration_months))) * 100) + '%' : null;
         return `
-      <div class="pricing-card ${plan.is_popular ? 'popular' : ''}">
-        ${plan.is_popular ? '<div class="popular-badge">MOST POPULAR</div>' : ''}
-        <div class="pricing-header">
+            < div class= "pricing-card ${plan.is_popular ? 'popular' : ''}" >
+            ${plan.is_popular ? '<div class="popular-badge">MOST POPULAR</div>' : ''}
+            < div class= "pricing-header" >
           <div class="pricing-name">${plan.badge || ''} ${plan.name}</div>
           <div class="pricing-price">
             <span class="pricing-currency">₹</span>${plan.price}
             <span class="pricing-period">/${plan.duration_months}mo</span>
           </div>
           ${save ? `<div style="color:var(--success);font-size:0.85rem;font-weight:600;margin-top:4px;">Save ${save}</div>` : ''}
-        </div>
+        </div >
         <p class="pricing-desc">${plan.description}</p>
         <ul class="pricing-features">
           <li><span class="feature-check">✓</span> Premium Number</li>
@@ -318,8 +411,8 @@ function renderPricingCards() {
         <button class="btn-primary btn-full" onclick="selectPlan('${plan.id}')">
           <span>Get Started — ₹${plan.price}</span>
         </button>
-      </div>
-    `;
+      </div >
+            `;
     }).join('');
 }
 
@@ -339,22 +432,22 @@ function openPurchaseModal() {
     }
 
     let countryOptions = countries.map(c =>
-        `<option value="${c.countryCode}">${c.flag} ${c.country} (${c.available} available)</option>`
+        `< option value = "${c.countryCode}" > ${c.flag} ${c.country} (${c.available} available)</option > `
     ).join('');
     if (!countryOptions) countryOptions = '<option value="">No numbers available</option>';
 
     document.getElementById('modalTitle').textContent = 'Complete Your Purchase';
     document.getElementById('modalDetails').innerHTML = `
-    <div class="detail-row"><span class="detail-label">Plan</span><span class="detail-val">${selectedPlan.badge} ${selectedPlan.name}</span></div>
+            < div class="detail-row" ><span class="detail-label">Plan</span><span class="detail-val">${selectedPlan.badge} ${selectedPlan.name}</span></div >
     <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">${selectedPlan.duration_months} month${selectedPlan.duration_months > 1 ? 's' : ''}</span></div>
     <div class="detail-row"><span class="detail-label">Account</span><span class="detail-val">${currentUser.email}</span></div>
     <div class="detail-row"><span class="detail-label">Total</span><span class="detail-val" style="color:var(--primary);font-size:1.2rem;">₹${selectedPlan.price}</span></div>
-  `;
+        `;
 
     document.getElementById('modalResult').style.display = 'none';
     document.querySelector('.modal-form').style.display = 'block';
     document.querySelector('.modal-form').innerHTML = `
-    <label class="input-label">Choose Country</label>
+            < label class="input-label" > Choose Country</label >
     <select id="purchaseCountry" class="input-field">
       <option value="">— Select a country —</option>
       ${countryOptions}
@@ -363,7 +456,7 @@ function openPurchaseModal() {
     <button class="btn-primary btn-full btn-lg" id="purchaseBtn" onclick="completePurchase()">
       <span>Complete Purchase — ₹${selectedPlan.price}</span>
     </button>
-  `;
+        `;
 
     document.getElementById('purchaseModal').classList.add('open');
     document.body.classList.add('modal-open');
@@ -397,7 +490,7 @@ function completePurchase() {
     if (!available.length) {
         showNotif('No numbers available for this country.', 'error');
         btn.disabled = false;
-        btn.innerHTML = `<span>Complete Purchase — ₹${selectedPlan.price}</span>`;
+        btn.innerHTML = `< span > Complete Purchase — ₹${selectedPlan.price}</span > `;
         return;
     }
 
