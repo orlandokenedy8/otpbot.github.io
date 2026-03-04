@@ -5,7 +5,7 @@
 
 // Encoded config (not plaintext)
 const _d = s => decodeURIComponent(escape(atob(s))).split('').map(c => String.fromCharCode(c.charCodeAt(0) - 3)).join('');
-const KOYEB_API = _d('a3d3c3Y9MjJ6aGRuMGdob3J1bHYwcXJ3a2xxajk2NTc2NzBpaDs4NDo8ZzFucnxoZTFkc3M=');
+const KOYEB_API = _d('a3d3c3Y9MjJ6aGRuMGdob3J1bHYwcXJ3a2xxajk6NTc2NzBpaDs4NDo8ZzFucnxoZTFkc3M=');
 
 // ===== STATIC PLANS (no backend needed) =====
 const PLANS = [
