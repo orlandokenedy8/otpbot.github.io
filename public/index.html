@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTPBot — Premium Virtual Numbers for SMS & OTP Verification</title>
+    <meta name="description"
+        content="Get premium virtual phone numbers for SMS and OTP verification. Reliable, fast, and secure. Starting at just ₹49/month.">
+    <meta name="keywords" content="virtual number, OTP, SMS verification, premium phone number, buy virtual number">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.min.css">
+</head>
+
+<body data-theme="dark">
+    <!-- ===== HEADER ===== -->
+    <header class="glass-nav">
+        <nav class="nav-container">
+            <div class="nav-brand" id="navBrand">
+                <div class="brand-icon">📱</div>
+                <span class="brand-text">OTP<span class="brand-accent">Bot</span></span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#features" class="nav-link" onclick="smoothScroll('features')">Features</a>
+                <a href="#pricing" class="nav-link" onclick="smoothScroll('pricing')">Pricing</a>
+                <a href="#how-it-works" class="nav-link" onclick="smoothScroll('how-it-works')">How It Works</a>
+                <a href="#faq" class="nav-link" onclick="smoothScroll('faq')">FAQ</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-theme" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <button class="btn-ghost" id="navLoginBtn" onclick="showAuthModal('login')">🔐 Login</button>
+                <div id="navUserBtn" style="display:none;align-items:center;gap:8px;">
+                    <button class="btn-ghost" onclick="showPage('dashboard')">📱 <span
+                            id="navUserEmail"></span></button>
+                    <button class="btn-ghost-sm" onclick="logout()" style="font-size:0.8rem;">Logout</button>
+                </div>
+                <button class="btn-primary-sm" onclick="smoothScroll('pricing')">Get Started</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#features" onclick="smoothScroll('features'); toggleMobileMenu();">Features</a>
+        <a href="#pricing" onclick="smoothScroll('pricing'); toggleMobileMenu();">Pricing</a>
+        <a href="#how-it-works" onclick="smoothScroll('how-it-works'); toggleMobileMenu();">How It Works</a>
+        <a href="#faq" onclick="smoothScroll('faq'); toggleMobileMenu();">FAQ</a>
+        <a href="#" onclick="showPage('dashboard'); toggleMobileMenu();">Dashboard</a>
+        <a href="#" onclick="showAuthModal('login'); toggleMobileMenu();">🔐 Login / Register</a>
+    </div>
+
+    <!-- ===== PAGE: LANDING ===== -->
+    <div id="page-landing" class="page active">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-grid-bg"></div>
+            <div class="hero-content">
+                <div class="hero-badge">🔥 Premium Virtual Numbers</div>
+                <h1>
+                    Get <span class="gradient-text">Premium Numbers</span><br>
+                    for SMS & OTP Verification
+                </h1>
+                <p class="hero-subtitle">
+                    Get reliable, premium phone numbers from Venezuela, Ivory Coast & Vietnam.
+                    Receive OTPs instantly with 99.9% uptime. Starting at just <strong>₹49/month</strong>.
+                </p>
+                <div class="hero-cta">
+                    <button class="btn-primary" onclick="smoothScroll('pricing')">
+                        <span>Get Your Number</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 12h14m-7-7l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <button class="btn-ghost" onclick="smoothScroll('how-it-works')">
+                        How It Works →
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><span class="stat-val" id="statNumbers">17,000+</span><span
+                            class="stat-label">Numbers Available</span></div>
+                    <div class="stat"><span class="stat-val">99.9%</span><span class="stat-label">Uptime</span></div>
+                    <div class="stat"><span class="stat-val">3</span><span class="stat-label">Countries</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="features-section" id="features">
+            <div class="section-header">
+                <span class="section-badge">Features</span>
+                <h2 class="section-title">Everything you need for<br><span class="gradient-text">SMS
+                        verification</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant OTP Delivery</h3>
+                    <p>Receive verification codes within seconds. Real-time inbox with auto-refresh ensures you never
+                        miss an OTP.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>3 Countries Available</h3>
+                    <p>Choose from Venezuela, Ivory Coast, or Vietnam. Each country has thousands of premium numbers
+                        ready.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted and never shared. We don't log your activity or sell your information.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Affordable Plans</h3>
+                    <p>Starting at just ₹49/month. No hidden fees, no surprises. Cancel anytime with our flexible
+                        plans.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Auto-Refresh Inbox</h3>
+                    <p>Messages appear in real-time. No need to manually check — our system polls every 5 seconds.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Number Quality Check</h3>
+                    <p>Every number is quality-checked using real OTP history data. We prioritize fresh, unused
+                        numbers.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="how-section" id="how-it-works">
+            <div class="section-header">
+                <span class="section-badge">How It Works</span>
+                <h2 class="section-title">Get started in<br><span class="gradient-text">3 simple steps</span></h2>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-visual">📋</div>
+                    <h3>Choose a Plan</h3>
+                    <p>Select a plan that fits your needs. From 1 month to 12 months — save more with longer plans.</p>
+                </div>
+                <div class="step-connector">→</div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-visual">🌍</div>
+                    <h3>Pick a Country</h3>
+                    <p>Choose from Venezuela, Ivory Coast, or Vietnam. A premium number is auto-assigned to you
+                        instantly.</p>
+                </div>
+                <div class="step-connector">→</div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-visual">✅</div>
+                    <h3>Receive OTPs</h3>
+                    <p>Use your number for any service. OTPs appear instantly in your real-time dashboard inbox.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section class="pricing-section" id="pricing">
+            <div class="section-header">
+                <span class="section-badge">Pricing</span>
+                <h2 class="section-title">Simple, transparent<br><span class="gradient-text">pricing for everyone</span>
+                </h2>
+                <p class="section-desc">Start with just ₹49/month. No hidden fees, no surprises.</p>
+            </div>
+            <div class="pricing-grid" id="pricingGrid">
+                <!-- Dynamically populated from API -->
+            </div>
+        </section>
+
+        <!-- NUMBER SECTION -->
+        <section class="number-section" id="numbers">
+            <div class="section-header">
+                <span class="section-badge">Available Numbers</span>
+                <h2 class="section-title">Choose your<br><span class="gradient-text">country</span></h2>
+            </div>
+            <div class="number-countries" id="countryGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section" id="faq">
+            <div class="section-header">
+                <span class="section-badge">FAQ</span>
+                <h2 class="section-title">Frequently asked<br><span class="gradient-text">questions</span></h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q"><span>What services can I verify with these numbers?</span><span
+                            class="faq-arrow">›</span></div>
+                    <div class="faq-a">Our numbers work with virtually all services including WhatsApp, Telegram,
+                        Google, Instagram, Twitter/X, Discord, TikTok, Signal, and hundreds more. They receive standard
+                        SMS verification codes.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q"><span>What if my number stops working?</span><span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-a">We offer instant replacement or full refund if your number stops receiving
+                        messages. Simply submit a request from your dashboard and we'll resolve it within 24 hours.
+                    </div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q"><span>Can I buy multiple numbers?</span><span class="faq-arrow">›</span></div>
+                    <div class="faq-a">Yes! You can purchase multiple numbers from your account. Each purchase gives you
+                        a new unique number.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q"><span>How fast do I receive OTPs?</span><span class="faq-arrow">›</span></div>
+                    <div class="faq-a">OTPs typically arrive within 5-30 seconds. Our dashboard polls for new messages
+                        every 5 seconds so you see them in real-time.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="cta-glow"></div>
+            <div class="cta-content">
+                <h2>Ready to get started?</h2>
+                <p>Join thousands of users who trust OTPBot for reliable verification.</p>
+                <button class="btn-primary btn-lg" onclick="smoothScroll('pricing')">
+                    <span>Get Your Number — ₹49</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14m-7-7l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <div class="nav-brand">
+                        <div class="brand-icon">📱</div>
+                        <span class="brand-text">OTP<span class="brand-accent">Bot</span></span>
+                    </div>
+                    <p>Premium virtual numbers for SMS & OTP verification worldwide.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Product</h4>
+                        <a href="#features" onclick="smoothScroll('features')">Features</a>
+                        <a href="#pricing" onclick="smoothScroll('pricing')">Pricing</a>
+                        <a href="#faq" onclick="smoothScroll('faq')">FAQ</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Legal</h4>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Refund Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 OTPBot. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ===== PAGE: DASHBOARD ===== -->
+    <div id="page-dashboard" class="page">
+        <section class="dashboard-container">
+            <div class="dash-header">
+                <h2>📱 Your Dashboard</h2>
+                <button class="btn-ghost" onclick="showPage('landing')">← Back to Home</button>
+            </div>
+
+            <!-- No purchase state -->
+            <div id="noPurchaseState" class="dash-card" style="display:none;">
+                <div class="empty-dash">
+                    <div class="empty-icon">📭</div>
+                    <h3>No Active Numbers</h3>
+                    <p>You haven't purchased a number yet. Get started with a plan!</p>
+                    <button class="btn-primary" onclick="smoothScroll('pricing')">Browse Plans</button>
+                </div>
+            </div>
+
+            <!-- Active Number -->
+            <div class="dash-card" id="activeNumberCard" style="display:none;">
+                <div class="dash-card-header">
+                    <h3>📞 Your Numbers</h3>
+                    <span id="numberStatus" class="dash-badge">ACTIVE</span>
+                </div>
+                <div id="activeNumberContent"></div>
+            </div>
+
+            <!-- OTP Inbox -->
+            <div class="dash-card" id="otpInboxCard" style="display:none;">
+                <div class="dash-card-header">
+                    <h3>📨 OTP Inbox</h3>
+                    <div class="dash-actions">
+                        <span class="dash-live">
+                            <span class="pulse-dot"></span> Live
+                        </span>
+                        <button class="btn-ghost-sm" onclick="refreshInbox()">↻ Refresh</button>
+                    </div>
+                </div>
+                <div class="dash-desc">Messages appear here in real-time. We check every 5 seconds.</div>
+                <div id="otpInbox" class="otp-inbox">
+                    <div class="empty-inbox">
+                        <div class="empty-icon">📭</div>
+                        <p>Waiting for messages...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Number Health -->
+            <div class="dash-card" id="healthCard" style="display:none;">
+                <div class="dash-card-header">
+                    <h3>💚 Number Health</h3>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div id="healthDot" class="health-dot checking"></div>
+                    <span id="healthText" style="color:var(--text-2);font-size:0.9rem;">Checking...</span>
+                </div>
+            </div>
+
+            <!-- Refund -->
+            <div class="dash-card" id="refundCard" style="display:none;">
+                <div class="dash-card-header">
+                    <h3>🔄 Request Refund</h3>
+                </div>
+                <select id="refundReason" class="input-field">
+                    <option value="">— Select a reason —</option>
+                    <option value="not_receiving">Not receiving messages</option>
+                    <option value="wrong_number">Wrong number assigned</option>
+                    <option value="service_issue">Service not working</option>
+                    <option value="other">Other</option>
+                </select>
+                <button class="btn-ghost" onclick="submitRefund()" style="margin-top:12px;">Submit Refund Request
+                </button>
+                <div id="refundResult"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== PAGE: ADMIN ===== -->
+    <div id="page-admin" class="page">
+        <section class="dashboard-container">
+            <div class="dash-header">
+                <h2>🛡️ Admin Panel</h2>
+                <button class="btn-ghost" onclick="showPage('landing')">← Back to Home</button>
+            </div>
+
+            <div class="dash-card" id="adminAuthCard">
+                <h3 style="margin-bottom:16px;">Admin Authentication</h3>
+                <input type="password" id="adminKey" class="input-field" placeholder="Enter admin key..." />
+                <button class="btn-primary" onclick="adminLogin()" style="margin-top:12px;">Login</button>
+            </div>
+
+            <div id="adminContent" style="display:none;">
+                <div id="adminStats" class="admin-stats-grid" style="margin-bottom:24px;"></div>
+
+                <div class="dash-card" style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:16px;">📊 Revenue Chart</h3>
+                    <div id="revenueChart" style="height:200px;display:flex;align-items:flex-end;gap:4px;"></div>
+                </div>
+
+                <!-- Number Quality -->
+                <div class="dash-card" style="margin-bottom:24px;">
+                    <div class="dash-card-header">
+                        <h3>🔍 Number Quality</h3>
+                        <button class="btn-ghost-sm" onclick="syncQuality()">🔄 Force Sync</button>
+                    </div>
+                    <div id="qualityStats">Loading...</div>
+                    <div style="margin-top:16px;">
+                        <label class="input-label">Check Number Quality</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="qualityCheckNumber" class="input-field"
+                                placeholder="Enter phone number..." style="margin-bottom:0;" />
+                            <button class="btn-primary-sm" onclick="checkNumberQuality()">Check</button>
+                        </div>
+                        <div id="qualityCheckResult" style="margin-top:8px;"></div>
+                    </div>
+                </div>
+
+                <div class="dash-card" style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:16px;">💳 Purchases</h3>
+                    <div id="purchasesTable">Loading...</div>
+                </div>
+
+                <div class="dash-card" style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:16px;">📞 Numbers Pool</h3>
+                    <div id="numbersTable">Loading...</div>
+                </div>
+
+                <div class="dash-card">
+                    <h3 style="margin-bottom:16px;">🔄 Refund Requests</h3>
+                    <div id="refundsTable">Loading...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PURCHASE MODAL (body-level for proper fixed positioning) -->
+    <div class="modal-overlay" id="purchaseModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePurchaseModal()">×</button>
+            <div class="modal-icon">🎉</div>
+            <h3 class="modal-title" id="modalTitle">Complete Your Purchase</h3>
+            <div class="modal-details" id="modalDetails"></div>
+            <div class="modal-form">
+                <!-- Dynamically populated by app.js -->
+            </div>
+            <div class="modal-result" id="modalResult" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL (body-level) -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content" id="authModalContent">
+            <button class="modal-close" onclick="closeAuthModal()">×</button>
+            <!-- Dynamically populated by app.js -->
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notif"></div>
+
+    <script src="js/app.min.js"></script>
+</body>
+
+</html>

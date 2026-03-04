@@ -2,7 +2,10 @@
 // OTPBot Premium — Application Logic
 // ============================================
 
-const API_BASE = '';
+// API Base — auto-detect: local dev vs production (GitHub Pages → Koyeb backend)
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? ''
+    : 'https://otpbot-api-orlandokenedy8.koyeb.app';
 
 // ===== STATE =====
 let plans = [];
