@@ -389,30 +389,28 @@ function renderPricingCards() {
     grid.innerHTML = plans.map(plan => {
         const monthly = (plan.price / plan.duration_months).toFixed(0);
         const save = plan.duration_months > 1 ? Math.round((1 - (plan.price / (basePrice * plan.duration_months))) * 100) + '%' : null;
-        return `
-            < div class= "pricing-card ${plan.is_popular ? 'popular' : ''}" >
-            ${plan.is_popular ? '<div class="popular-badge">MOST POPULAR</div>' : ''}
-            < div class= "pricing-header" >
-          <div class="pricing-name">${plan.badge || ''} ${plan.name}</div>
-          <div class="pricing-price">
-            <span class="pricing-currency">₹</span>${plan.price}
-            <span class="pricing-period">/${plan.duration_months}mo</span>
-          </div>
-          ${save ? `<div style="color:var(--success);font-size:0.85rem;font-weight:600;margin-top:4px;">Save ${save}</div>` : ''}
-        </div >
-        <p class="pricing-desc">${plan.description}</p>
-        <ul class="pricing-features">
-          <li><span class="feature-check">✓</span> Premium Number</li>
-          <li><span class="feature-check">✓</span> Real-time OTP Inbox</li>
-          <li><span class="feature-check">✓</span> ${plan.duration_months} Month${plan.duration_months > 1 ? 's' : ''} Access</li>
-          ${plan.duration_months >= 3 ? '<li><span class="feature-check">✓</span> Number Replacement</li>' : ''}
-          ${plan.duration_months >= 6 ? '<li><span class="feature-check">✓</span> Priority Support</li>' : ''}
-        </ul>
-        <button class="btn-primary btn-full" onclick="selectPlan('${plan.id}')">
-          <span>Get Started — ₹${plan.price}</span>
-        </button>
-      </div >
-            `;
+        return '<div class="pricing-card ' + (plan.is_popular ? 'popular' : '') + '">'
+            + (plan.is_popular ? '<div class="popular-badge">MOST POPULAR</div>' : '')
+            + '<div class="pricing-header">'
+            + '<div class="pricing-name">' + (plan.badge || '') + ' ' + plan.name + '</div>'
+            + '<div class="pricing-price">'
+            + '<span class="pricing-currency">₹</span>' + plan.price
+            + '<span class="pricing-period">/' + plan.duration_months + 'mo</span>'
+            + '</div>'
+            + (save ? '<div style="color:var(--success);font-size:0.85rem;font-weight:600;margin-top:4px;">Save ' + save + '</div>' : '')
+            + '</div>'
+            + '<p class="pricing-desc">' + plan.description + '</p>'
+            + '<ul class="pricing-features">'
+            + '<li><span class="feature-check">✓</span> Premium Number</li>'
+            + '<li><span class="feature-check">✓</span> Real-time OTP Inbox</li>'
+            + '<li><span class="feature-check">✓</span> ' + plan.duration_months + ' Month' + (plan.duration_months > 1 ? 's' : '') + ' Access</li>'
+            + (plan.duration_months >= 3 ? '<li><span class="feature-check">✓</span> Number Replacement</li>' : '')
+            + (plan.duration_months >= 6 ? '<li><span class="feature-check">✓</span> Priority Support</li>' : '')
+            + '</ul>'
+            + '<button class="btn-primary btn-full" onclick="selectPlan(\'' + plan.id + '\')">'
+            + '<span>Get Started — ₹' + plan.price + '</span>'
+            + '</button>'
+            + '</div>';
     }).join('');
 }
 
@@ -431,32 +429,28 @@ function openPurchaseModal() {
         return;
     }
 
-    let countryOptions = countries.map(c =>
-        `< option value = "${c.countryCode}" > ${c.flag} ${c.country} (${c.available} available)</option > `
-    ).join('');
+    let countryOptions = countries.map(function (c) {
+        return '<option value="' + c.countryCode + '">' + c.flag + ' ' + c.country + ' (' + c.available + ' available)</option>';
+    }).join('');
     if (!countryOptions) countryOptions = '<option value="">No numbers available</option>';
 
     document.getElementById('modalTitle').textContent = 'Complete Your Purchase';
-    document.getElementById('modalDetails').innerHTML = `
-            < div class="detail-row" ><span class="detail-label">Plan</span><span class="detail-val">${selectedPlan.badge} ${selectedPlan.name}</span></div >
-    <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">${selectedPlan.duration_months} month${selectedPlan.duration_months > 1 ? 's' : ''}</span></div>
-    <div class="detail-row"><span class="detail-label">Account</span><span class="detail-val">${currentUser.email}</span></div>
-    <div class="detail-row"><span class="detail-label">Total</span><span class="detail-val" style="color:var(--primary);font-size:1.2rem;">₹${selectedPlan.price}</span></div>
-        `;
+    document.getElementById('modalDetails').innerHTML = '<div class="detail-row"><span class="detail-label">Plan</span><span class="detail-val">' + (selectedPlan.badge || '') + ' ' + selectedPlan.name + '</span></div>'
+        + '<div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">' + selectedPlan.duration_months + ' month' + (selectedPlan.duration_months > 1 ? 's' : '') + '</span></div>'
+        + '<div class="detail-row"><span class="detail-label">Account</span><span class="detail-val">' + currentUser.email + '</span></div>'
+        + '<div class="detail-row"><span class="detail-label">Total</span><span class="detail-val" style="color:var(--primary);font-size:1.2rem;">₹' + selectedPlan.price + '</span></div>';
 
     document.getElementById('modalResult').style.display = 'none';
     document.querySelector('.modal-form').style.display = 'block';
-    document.querySelector('.modal-form').innerHTML = `
-            < label class="input-label" > Choose Country</label >
-    <select id="purchaseCountry" class="input-field">
-      <option value="">— Select a country —</option>
-      ${countryOptions}
-    </select>
-    <p class="input-hint">A random fresh number from this country will be assigned to you</p>
-    <button class="btn-primary btn-full btn-lg" id="purchaseBtn" onclick="completePurchase()">
-      <span>Complete Purchase — ₹${selectedPlan.price}</span>
-    </button>
-        `;
+    document.querySelector('.modal-form').innerHTML = '<label class="input-label">Choose Country</label>'
+        + '<select id="purchaseCountry" class="input-field">'
+        + '<option value="">— Select a country —</option>'
+        + countryOptions
+        + '</select>'
+        + '<p class="input-hint">A random fresh number from this country will be assigned to you</p>'
+        + '<button class="btn-primary btn-full btn-lg" id="purchaseBtn" onclick="completePurchase()">'
+        + '<span>Complete Purchase — ₹' + selectedPlan.price + '</span>'
+        + '</button>';
 
     document.getElementById('purchaseModal').classList.add('open');
     document.body.classList.add('modal-open');
