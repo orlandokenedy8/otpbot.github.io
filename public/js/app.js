@@ -56,16 +56,6 @@ function hashPassword(pw) {
 let currentUser = null;
 let authToken = null;
 
-// Server API helper — enables cross-device auth
-async function apiCall(endpoint, method, body) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
-    const opts = { method: method || 'GET', headers };
-    if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(endpoint, opts);
-    return res.json();
-}
-
 function loadSession() {
     const s = DB.getSession();
     if (s && s.expires > Date.now()) {
@@ -90,18 +80,19 @@ function generateRecoveryPhrase() {
     return phrase.join(' ');
 }
 
-async function registerUser(email, password) {
-    try {
-        const data = await apiCall('/api/register', 'POST', { email, password });
-        if (data.success) {
-            DB.saveSession({ user: data.user, token: data.token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 });
-            currentUser = data.user;
-            authToken = data.token;
-        }
-        return data;
-    } catch (e) {
-        return { success: false, error: 'Network error. Please check your connection and try again.' };
-    }
+function registerUser(email, password) {
+    const users = DB.getUsers();
+    if (users.find(u => u.email === email)) return { success: false, error: 'Email already registered. Please login.' };
+    const phrase = generateRecoveryPhrase();
+    const user = { id: generateId(), email, passwordHash: hashPassword(password), recoveryHash: hashPassword(phrase.trim().toLowerCase()), createdAt: new Date().toISOString() };
+    users.push(user);
+    DB.saveUsers(users);
+    const token = generateId() + generateId();
+    const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    DB.saveSession(session);
+    currentUser = session.user;
+    authToken = token;
+    return { success: true, user: session.user, phrase };
 }
 
 function recoverAccount(email, phrase, newPassword) {
@@ -122,22 +113,19 @@ function recoverAccount(email, phrase, newPassword) {
     return { success: true, user: session.user };
 }
 
-async function loginUser(email, password) {
-    try {
-        const data = await apiCall('/api/login', 'POST', { email, password });
-        if (data.success) {
-            DB.saveSession({ user: data.user, token: data.token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 });
-            currentUser = data.user;
-            authToken = data.token;
-        }
-        return data;
-    } catch (e) {
-        return { success: false, error: 'Network error. Please check your connection and try again.' };
-    }
+function loginUser(email, password) {
+    const users = DB.getUsers();
+    const user = users.find(u => u.email === email);
+    if (!user || user.passwordHash !== hashPassword(password)) return { success: false, error: 'Invalid email or password.' };
+    const token = generateId() + generateId();
+    const session = { user: { id: user.id, email: user.email }, token, expires: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    DB.saveSession(session);
+    currentUser = session.user;
+    authToken = token;
+    return { success: true, user: session.user };
 }
 
-async function logoutUser() {
-    try { await apiCall('/api/logout', 'POST'); } catch(e) {}
+function logoutUser() {
     DB.clearSession();
     currentUser = null;
     authToken = null;
@@ -292,7 +280,7 @@ function showRecoveryModal(phrase) {
     `;
 }
 
-async function submitAuth(mode) {
+function submitAuth(mode) {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
 
@@ -316,19 +304,16 @@ async function submitAuth(mode) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showNotif('Invalid email.', 'error');
     if (mode === 'register' && password.length < 4) return showNotif('Password min 4 characters.', 'error');
 
-    // Show loading state
-    const btn = document.getElementById('authSubmitBtn');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loader" style="width:18px;height:18px;margin:0 auto;border-width:2px;"></div>'; }
-
-    const result = mode === 'login' ? await loginUser(email, password) : await registerUser(email, password);
-
-    if (btn) { btn.disabled = false; btn.textContent = mode === 'login' ? 'Login' : 'Create Account'; }
-
+    const result = mode === 'login' ? loginUser(email, password) : registerUser(email, password);
     if (result.success) {
         updateNavUI();
-        closeAuthModal();
-        showNotif(mode === 'register' ? '🎉 Account created! Welcome to OTPBot!' : '✅ Welcome back, ' + result.user.email + '!', 'success');
-        initDashboard();
+        if (mode === 'register') {
+            showRecoveryModal(result.phrase);
+        } else {
+            closeAuthModal();
+            showNotif('✅ Welcome back, ' + result.user.email + '!', 'success');
+            initDashboard();
+        }
     } else {
         showNotif(result.error, 'error');
     }
@@ -930,18 +915,5 @@ async function init() {
     renderPricingCards();
     checkHash();
     await Promise.all([loadNumbersFromAPI(), loadOtpsFromAPI()]);
-
-    // Verify cached session is still valid on the server
-    if (currentUser && authToken) {
-        try {
-            const data = await apiCall('/api/me');
-            if (!data.success) {
-                DB.clearSession();
-                currentUser = null;
-                authToken = null;
-                updateNavUI();
-            }
-        } catch(e) { /* server unreachable — keep local session */ }
-    }
 }
 init();
