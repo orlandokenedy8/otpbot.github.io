@@ -256,8 +256,8 @@ function renderAuthForm(mode) {
       </button>
       <p style="text-align:center;margin-top:16px;color:var(--text-3);font-size:0.85rem;">
         ${isLogin
-            ? "Don't have an account? <a href='#' onclick='renderAuthForm(\\\"register\\\"); return false;' style='color:var(--primary);'>Register</a>"
-            : "Already have an account? <a href='#' onclick='renderAuthForm(\\\"login\\\"); return false;' style='color:var(--primary);'>Login</a>"
+            ? "Don't have an account? <a href='#' onclick='renderAuthForm(\"register\"); return false;' style='color:var(--primary);'>Register</a>"
+            : "Already have an account? <a href='#' onclick='renderAuthForm(\"login\"); return false;' style='color:var(--primary);'>Login</a>"
         }
       </p>
     `;
